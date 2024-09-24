@@ -43,7 +43,7 @@ function initMap() {
                     'rgba(255, 0, 0, 1)'
                 ],
                 radius: 20, // Increase the radius for more intensity
-                opacity: 1.0 // Increase the opacity for more visibility
+                opacity: .90 // Increase the opacity for more visibility
             });
 
             heatmap.setMap(map);
