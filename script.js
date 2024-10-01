@@ -1,7 +1,9 @@
+let map;
+
 function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
-        center: {lat: 38.951643, lng: -92.334038},
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12.5,
+        center: {lat: 38.947907, lng: -92.323575},
         mapTypeId: 'roadmap',
         styles: [
             { elementType: 'geometry', stylers: [{ color: '#212121' }] },
@@ -27,71 +29,202 @@ function initMap() {
             { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
         ]
     });
+    // Ensure the map is fully loaded before calling loadMapShapes
+    google.maps.event.addListenerOnce(map, 'idle', loadMapShapes);
+    placeOnLatLong('ADDRESSES_WITH_WARD_LAT_LONG.csv', map)
 
     fetch('COMOGeoJSON.json')
-        .then(response => {
-            console.log('Response received:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Data parsed:', data);
-            var heatmapData = [];
+    .then(response => {
+        console.log('Response received:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data parsed:', data);
+        var heatmapData = [];
 
-            data.features.forEach(feature => {
-                var coords = feature.geometry.coordinates;
-                var latLng = new google.maps.LatLng(coords[1], coords[0]);
-                heatmapData.push(latLng);
-            });
-
-            console.log('Heatmap data:', heatmapData);
-
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: heatmapData,
-                gradient: [
-                    'rgba(0, 255, 255, 0)',
-                    'rgba(0, 255, 255, 1)',
-                    'rgba(0, 191, 255, 1)',
-                    'rgba(0, 127, 255, 1)',
-                    'rgba(0, 63, 255, 1)',
-                    'rgba(0, 0, 255, 1)',
-                    'rgba(0, 0, 223, 1)',
-                    'rgba(0, 0, 191, 1)',
-                    'rgba(0, 0, 159, 1)',
-                    'rgba(0, 0, 127, 1)',
-                    'rgba(63, 0, 91, 1)',
-                    'rgba(127, 0, 63, 1)',
-                    'rgba(191, 0, 31, 1)',
-                    'rgba(255, 0, 0, 1)'
-                ],
-                radius: 20,
-                opacity: 0.8 // Corrected opacity value
-            });
-
-            heatmap.setMap(map);
-
-
-        })
-        .catch(error => console.error('Error loading GeoJSON data:', error));
-
-        var kmlLayer = new google.maps.KmlLayer({
-            url: 'https://drive.google.com/uc?export=download&id=1aAXAiLRDODSN9IroOf5coeKY423EemEk',
-            map: map,
-            preserveViewport: true,
-            suppressInfoWindows: true
+        data.features.forEach(feature => {
+            var coords = feature.geometry.coordinates;
+            var latLng = new google.maps.LatLng(coords[1], coords[0]);
+            heatmapData.push(latLng);
         });
-        
-        google.maps.event.addListener(kmlLayer, 'status_changed', function() {
-            if (kmlLayer.getStatus() !== google.maps.KmlLayerStatus.OK) {
-                console.error('KML Layer failed to load:', kmlLayer.getStatus());
-            }
+
+        console.log('Heatmap data:', heatmapData);
+
+        var heatmap = new google.maps.visualization.HeatmapLayer({
+            data: heatmapData,
+            gradient: [
+                'rgba(0, 255, 255, 0)',
+                'rgba(0, 255, 255, 1)',
+                'rgba(0, 191, 255, 1)',
+                'rgba(0, 127, 255, 1)',
+                'rgba(0, 63, 255, 1)',
+                'rgba(0, 0, 255, 1)',
+                'rgba(0, 0, 223, 1)',
+                'rgba(0, 0, 191, 1)',
+                'rgba(0, 0, 159, 1)',
+                'rgba(0, 0, 127, 1)',
+                'rgba(63, 0, 91, 1)',
+                'rgba(127, 0, 63, 1)',
+                'rgba(191, 0, 31, 1)',
+                'rgba(255, 0, 0, 1)'
+            ],
+            radius: 20,
+            opacity: 0.8 // Corrected opacity value
         });
-        
-        google.maps.event.addListener(kmlLayer, 'click', function(event) {
-            const content = "TEST"; // Display "TEST" when clicking
-            const infowindow = new google.maps.InfoWindow({
-                content: content,
-                position: event.latLng,
+
+        heatmap.setMap(map);
+
+
+    })
+}
+
+//UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
+let wards = {
+'Lisa Meyer':'Ward 1', 
+'Nick Foster':'Ward 2', 
+'Valerie Carroll':'Ward 3', 
+'Roy Lovelady':'Ward 4', 
+'Donald Waterman':'Ward 5',
+'Betsy Peters':'Ward 6'
+
+
+}
+
+function placeOnLatLong(csvFilePath, map) {
+    const markerIcon = {
+        url: "https://static.vecteezy.com/system/resources/previews/011/195/998/original/diamond-shape-for-design-png.png",
+        scaledSize: new google.maps.Size(30, 30) // Adjust the size as needed
+    };
+
+    // Fetch the CSV file
+    fetch(csvFilePath)
+        .then(response => response.text())
+        .then(csvText => {
+            // Parse the CSV file
+            Papa.parse(csvText, {
+                header: true,
+                complete: function(results) {
+                    // Iterate over each row in the CSV
+                    results.data.forEach(row => {
+                        // Extract latitude and longitude
+                        const lat = parseFloat(row.Latitude);
+                        const lng = parseFloat(row.Longitude);
+                        const name = row.LocAcctName; // Ensure this is a string
+
+                        // Check if lat and lng are valid numbers
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            // Create a marker and place it on the map
+                            new google.maps.Marker({
+                                position: { lat: lat, lng: lng },
+                                map: map,
+                                icon: markerIcon,
+                                title: name
+                            });
+                        }
+                    });
+                }
             });
-            infowindow.open(map);
         });
 }
+
+
+
+
+
+function loadMapShapes() {
+    let infowindow = null;
+    let featureData = {};
+
+    // Load CSV data
+    fetch('data.csv')
+        .then(response => response.text())
+        .then(csvText => {
+            const rows = csvText.split('\n');
+            const headers = rows[0].split(',');
+            rows.slice(1).forEach(row => {
+                const values = row.split(',');
+                const name = values[0];
+                featureData[name] = {};
+                headers.forEach((header, index) => {
+                    featureData[name][header] = values[index];
+                });
+            });
+        });
+    // Load US state outline polygons from a GeoJson file
+    map.data.loadGeoJson("WardOutlines.geojson");
+
+    // Set the style for the polygons
+    map.data.setStyle({
+        fillColor: '#FF5733', // Change this to your desired hex color
+        strokeColor: '#FF5733', // Change this to your desired hex color
+        strokeWeight: 2
+    });
+
+    // Add a click listener to the features
+    map.data.addListener('click', function(event) {
+        if (infowindow) {
+            infowindow.close();
+        }
+
+        const featureName = event.feature.getProperty('Name');
+        const featureInfo = featureData[featureName] || {};
+        const geometry = event.feature.getGeometry();
+        const bounds = new google.maps.LatLngBounds();
+        geometry.forEachLatLng(function(latlng) {
+            bounds.extend(latlng);
+        });
+
+        const center = bounds.getCenter();
+
+        // Create custom content for the info window
+        let content = `
+            <title>Feature Info Table</title>
+            <style>
+                #infoTable {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                #infoTable th, #infoTable td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+                #infoTable th {
+                    background-color: #f2f2f2;
+                    text-align: left;
+                }
+            </style>
+            <table id="infoTable">
+            <caption style="font-weight: bold">${wards[featureName]}</caption>
+                <tbody>`;
+
+        for (const [property, value] of Object.entries(featureInfo)) {
+            content += `
+                    <tr>
+                        <td>${property}</td>
+                        <td>${value ? value : 'N/A'}</td>
+                    </tr>`;
+        }
+
+        content += `
+                </tbody>
+            </table>`;
+
+        infowindow = new google.maps.InfoWindow({
+            content: content,
+            position: center,
+            disableAutoPan: true // Prevent the map from panning when the info window opens
+        });
+        infowindow.open(map);
+    });
+
+    // Add a hover listener to change the cursor
+    map.data.addListener('mouseover', function(event) {
+        map.data.overrideStyle(event.feature, { cursor: 'pointer' });
+    });
+
+    map.data.addListener('mouseout', function(event) {
+        map.data.revertStyle();
+    });
+}
+
+
