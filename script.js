@@ -30,52 +30,13 @@ function initMap() {
         ]
     });
     // Ensure the map is fully loaded before calling loadMapShapes
-    google.maps.event.addListenerOnce(map, 'idle', loadMapShapes);
-    placeOnLatLong('ADDRESSES_WITH_WARD_LAT_LONG.csv', map)
-
-    fetch('COMOGeoJSON.json')
-    .then(response => {
-        console.log('Response received:', response);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Data parsed:', data);
-        var heatmapData = [];
-
-        data.features.forEach(feature => {
-            var coords = feature.geometry.coordinates;
-            var latLng = new google.maps.LatLng(coords[1], coords[0]);
-            heatmapData.push(latLng);
-        });
-
-        console.log('Heatmap data:', heatmapData);
-
-        var heatmap = new google.maps.visualization.HeatmapLayer({
-            data: heatmapData,
-            gradient: [
-                'rgba(0, 255, 255, 0)',
-                'rgba(0, 255, 255, 1)',
-                'rgba(0, 191, 255, 1)',
-                'rgba(0, 127, 255, 1)',
-                'rgba(0, 63, 255, 1)',
-                'rgba(0, 0, 255, 1)',
-                'rgba(0, 0, 223, 1)',
-                'rgba(0, 0, 191, 1)',
-                'rgba(0, 0, 159, 1)',
-                'rgba(0, 0, 127, 1)',
-                'rgba(63, 0, 91, 1)',
-                'rgba(127, 0, 63, 1)',
-                'rgba(191, 0, 31, 1)',
-                'rgba(255, 0, 0, 1)'
-            ],
-            radius: 20,
-            opacity: 0.8 // Corrected opacity value
-        });
-
-        heatmap.setMap(map);
-
-
-    })
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+        loadMapShapes();
+        placeOnLatLong('ADDRESSES_WITH_WARD_LAT_LONG.csv', map);
+        placeHeatMap('ADDRESSES_WITH_WARD_LAT_LONG.csv', map);
+    });
+    
+    
 }
 
 //UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
@@ -86,14 +47,69 @@ let wards = {
 'Roy Lovelady':'Ward 4', 
 'Donald Waterman':'Ward 5',
 'Betsy Peters':'Ward 6'
-
-
 }
+
+function placeHeatMap(csvFilePath, map) {
+    fetch(csvFilePath)
+    .then(response => response.text())
+    .then(csvText => {
+        console.log('CSV data:', csvText);
+        
+        // Parse CSV data
+        Papa.parse(csvText, {
+            header: true,
+            complete: function(results) {
+                var heatmapData = [];
+                
+                results.data.forEach(row => {
+                    var lat = parseFloat(row['Latitude']);
+                    var lng = parseFloat(row['Longitude']);
+                    var weight = parseFloat(row['Weight']) || 1; // Default weight to 1 if not provided
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        var latLng = new google.maps.LatLng(lat, lng);
+                        // Push the point multiple times to increase its intensity
+
+                            heatmapData.push({location:latLng,weight:weight});
+
+                    }
+                });
+
+                console.log('Heatmap data:', heatmapData);
+
+                var heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: heatmapData,
+                    gradient: [
+                        'rgba(0, 255, 255, 0)',
+                        'rgba(0, 255, 255, 1)',
+                        'rgba(0, 191, 255, 1)',
+                        'rgba(0, 127, 255, 1)',
+                        'rgba(0, 63, 255, 1)',
+                        'rgba(0, 0, 255, 1)',
+                        'rgba(0, 0, 223, 1)',
+                        'rgba(0, 0, 191, 1)',
+                        'rgba(0, 0, 159, 1)',
+                        'rgba(0, 0, 127, 1)',
+                        'rgba(63, 0, 91, 1)',
+                        'rgba(127, 0, 63, 1)',
+                        'rgba(191, 0, 31, 1)',
+                        'rgba(255, 0, 0, 1)'
+                    ],
+                    radius: 40,
+                    opacity: 1
+                });
+
+                heatmap.setMap(map);
+            }
+        });
+    });
+}
+
+
 
 function placeOnLatLong(csvFilePath, map) {
     const markerIcon = {
-        url: "https://static.vecteezy.com/system/resources/previews/011/195/998/original/diamond-shape-for-design-png.png",
-        scaledSize: new google.maps.Size(30, 30) // Adjust the size as needed
+        url: "https://static.vecteezy.com/system/resources/previews/016/314/339/original/red-circle-red-dot-icon-free-png.png",
+        scaledSize: new google.maps.Size(10, 10) // Adjust the size as needed
     };
 
     // Fetch the CSV file
@@ -155,8 +171,8 @@ function loadMapShapes() {
 
     // Set the style for the polygons
     map.data.setStyle({
-        fillColor: '#FF5733', // Change this to your desired hex color
-        strokeColor: '#FF5733', // Change this to your desired hex color
+        fillColor: '#FFFFFF', // Change this to your desired hex color
+        strokeColor: '#FFFFFF', // Change this to your desired hex color
         strokeWeight: 2
     });
 
