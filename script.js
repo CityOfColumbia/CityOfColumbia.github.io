@@ -1,10 +1,41 @@
 let map;
+let wards = {
+    'Lisa Meyer':'Ward 2', 
+    'Nick Foster':'Ward 4', 
+    'Valerie Carroll':'Ward 1', 
+    'Roy Lovelady':'Ward 3', 
+    'Donald Waterman':'Ward 5',
+    'Betsy Peters':'Ward 6'
+    };
+let marker_groups = {};
 
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
+async function initMap() {
+    map = createMapDefinitions()
+    let data;
+
+    data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
+    // processData('ADDRESSES_WITH_WARD_LAT_LONG.csv',map)
+
+    // Ensure the map is fully loaded before calling loadMapShapes
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+        loadMapShapes();
+        placeOnLatLong(data, map);
+        placeHeatMap(data, map);
+
+    });
+
+    
+}
+
+//UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
+
+function createMapDefinitions(){
+    return new google.maps.Map(document.getElementById('map'), {
         zoom: 12.5,
         center: {lat: 38.947907, lng: -92.323575},
         mapTypeId: 'roadmap',
+        mapTypeControl: false,
+        minZoom:10,
         styles: [
             { elementType: 'geometry', stylers: [{ color: '#212121' }] },
             { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
@@ -29,122 +60,78 @@ function initMap() {
             { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
         ]
     });
-    // Ensure the map is fully loaded before calling loadMapShapes
-    google.maps.event.addListenerOnce(map, 'idle', function() {
-        loadMapShapes();
-        placeOnLatLong('ADDRESSES_WITH_WARD_LAT_LONG.csv', map);
-        placeHeatMap('ADDRESSES_WITH_WARD_LAT_LONG.csv', map);
+}
+
+function placeHeatMap(data, map) {
+    var heatmapData = [];
+
+    data.forEach(row => {
+        var lat = parseFloat(row['Latitude']);
+        var lng = parseFloat(row['Longitude']);
+        var weight = parseFloat(row['Weight']) || 1; // Default weight to 1 if not provided
+        if (!isNaN(lat) && !isNaN(lng)) {
+            var latLng = new google.maps.LatLng(lat, lng);
+            heatmapData.push({ location: latLng, weight: weight });
+        }
     });
-    
-    
-}
 
-//UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
-let wards = {
-'Lisa Meyer':'Ward 1', 
-'Nick Foster':'Ward 2', 
-'Valerie Carroll':'Ward 3', 
-'Roy Lovelady':'Ward 4', 
-'Donald Waterman':'Ward 5',
-'Betsy Peters':'Ward 6'
-}
+    console.log('Heatmap data:', heatmapData);
 
-function placeHeatMap(csvFilePath, map) {
-    fetch(csvFilePath)
-    .then(response => response.text())
-    .then(csvText => {
-        console.log('CSV data:', csvText);
-        
-        // Parse CSV data
-        Papa.parse(csvText, {
-            header: true,
-            complete: function(results) {
-                var heatmapData = [];
-                
-                results.data.forEach(row => {
-                    var lat = parseFloat(row['Latitude']);
-                    var lng = parseFloat(row['Longitude']);
-                    var weight = parseFloat(row['Weight']) || 1; // Default weight to 1 if not provided
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        var latLng = new google.maps.LatLng(lat, lng);
-                        // Push the point multiple times to increase its intensity
-
-                            heatmapData.push({location:latLng,weight:weight});
-
-                    }
-                });
-
-                console.log('Heatmap data:', heatmapData);
-
-                var heatmap = new google.maps.visualization.HeatmapLayer({
-                    data: heatmapData,
-                    gradient: [
-                        'rgba(0, 255, 255, 0)',
-                        'rgba(0, 255, 255, 1)',
-                        'rgba(0, 191, 255, 1)',
-                        'rgba(0, 127, 255, 1)',
-                        'rgba(0, 63, 255, 1)',
-                        'rgba(0, 0, 255, 1)',
-                        'rgba(0, 0, 223, 1)',
-                        'rgba(0, 0, 191, 1)',
-                        'rgba(0, 0, 159, 1)',
-                        'rgba(0, 0, 127, 1)',
-                        'rgba(63, 0, 91, 1)',
-                        'rgba(127, 0, 63, 1)',
-                        'rgba(191, 0, 31, 1)',
-                        'rgba(255, 0, 0, 1)'
-                    ],
-                    radius: 40,
-                    opacity: 1
-                });
-
-                heatmap.setMap(map);
-            }
-        });
+    var heatmap = new google.maps.visualization.HeatmapLayer({
+        data: heatmapData,
+        gradient: [
+            'rgba(0, 255, 255, 0)',
+            'rgba(0, 255, 255, 1)',
+            'rgba(0, 191, 255, 1)',
+            'rgba(0, 127, 255, 1)',
+            'rgba(0, 63, 255, 1)',
+            'rgba(0, 0, 255, 1)',
+            'rgba(0, 0, 223, 1)',
+            'rgba(0, 0, 191, 1)',
+            'rgba(0, 0, 159, 1)',
+            'rgba(0, 0, 127, 1)',
+            'rgba(63, 0, 91, 1)',
+            'rgba(127, 0, 63, 1)',
+            'rgba(191, 0, 31, 1)',
+            'rgba(255, 0, 0, 1)'
+        ],
+        radius: 40,
+        opacity: 1
     });
+
+    heatmap.setMap(map);
 }
 
 
-
-function placeOnLatLong(csvFilePath, map) {
+function placeOnLatLong(csvData, map) {
     const markerIcon = {
-        url: "https://static.vecteezy.com/system/resources/previews/016/314/339/original/red-circle-red-dot-icon-free-png.png",
+        url: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3255658/square-rotated-icon-md.png",
         scaledSize: new google.maps.Size(10, 10) // Adjust the size as needed
     };
 
-    // Fetch the CSV file
-    fetch(csvFilePath)
-        .then(response => response.text())
-        .then(csvText => {
-            // Parse the CSV file
-            Papa.parse(csvText, {
-                header: true,
-                complete: function(results) {
-                    // Iterate over each row in the CSV
-                    results.data.forEach(row => {
-                        // Extract latitude and longitude
-                        const lat = parseFloat(row.Latitude);
-                        const lng = parseFloat(row.Longitude);
-                        const name = row.LocAcctName; // Ensure this is a string
+    // Group markers by "Name"
+    csvData.forEach(row => {
+        const lat = parseFloat(row.Latitude);
+        const lng = parseFloat(row.Longitude);
+        const name = row.LocAcctName;
+        const group = wards[row.Name];
 
-                        // Check if lat and lng are valid numbers
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            // Create a marker and place it on the map
-                            new google.maps.Marker({
-                                position: { lat: lat, lng: lng },
-                                map: map,
-                                icon: markerIcon,
-                                title: name
-                            });
-                        }
-                    });
-                }
+        if (!isNaN(lat) && !isNaN(lng)) {
+            const marker = new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: map,
+                icon: markerIcon,
+                title: name
             });
-        });
+
+            if (!marker_groups[group]) {
+                marker_groups[group] = [];
+            }
+            marker_groups[group].push(marker);
+        }
+    });
+    console.log(marker_groups)
 }
-
-
-
 
 
 function loadMapShapes() {
@@ -243,4 +230,27 @@ function loadMapShapes() {
     });
 }
 
+async function loadCSV(url) {
+    const response = await fetch(url);
+    const csvText = await response.text();
+    const parsedData = Papa.parse(csvText, {
+        header: true,
+        dynamicTyping: true
+    }).data;
 
+    // Filter out any undefined entries
+    const filteredData = parsedData.filter(row => row !== undefined);
+    return filteredData;
+}
+
+function toggleGroup(group) {
+    if (marker_groups[group]) {
+        marker_groups[group].forEach(marker => {
+            if (marker.getMap()) {
+                marker.setMap(null);
+            } else {
+                marker.setMap(map);
+            }
+        });
+    }
+}

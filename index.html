@@ -1,24 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Business Heat Map</title>
+    <title>Business Map</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXFye0a95qdi9jgrsp6UDVAlR6UaMV2r0&libraries=visualization&callback=initMap" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <script src="script.js"></script>
     <style>
-        #map {
-            height: 100%;
-            width: 100%;
-        }
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
         }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="controls">
+        <table>
+            <tr>
+                <td><input type="checkbox" id="ward1" onclick="toggleGroup('Ward 1')" checked> Ward 1</td>
+                <td><input type="checkbox" id="ward2" onclick="toggleGroup('Ward 2')" checked> Ward 2</td>
+                <td><input type="checkbox" id="ward3" onclick="toggleGroup('Ward 3')" checked> Ward 3</td>
+                <td><input type="checkbox" id="ward4" onclick="toggleGroup('Ward 4')" checked> Ward 4</td>
+                <td><input type="checkbox" id="ward5" onclick="toggleGroup('Ward 5')" checked> Ward 5</td>
+                <td><input type="checkbox" id="ward6" onclick="toggleGroup('Ward 6')" checked> Ward 6</td>
+            </tr>
+        </table>
 </body>
 </html>
