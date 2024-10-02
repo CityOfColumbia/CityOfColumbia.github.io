@@ -35,6 +35,7 @@ function createMapDefinitions(){
         center: {lat: 38.947907, lng: -92.323575},
         mapTypeId: 'roadmap',
         mapTypeControl: false,
+        streetViewControl: false,
         minZoom:10,
         styles: [
             { elementType: 'geometry', stylers: [{ color: '#212121' }] },
@@ -104,6 +105,7 @@ function placeHeatMap(data, map) {
 
 
 function placeOnLatLong(csvData, map) {
+    const infoWindow = new google.maps.InfoWindow();
     const markerIcon = {
         url: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3255658/square-rotated-icon-md.png",
         scaledSize: new google.maps.Size(10, 10) // Adjust the size as needed
@@ -128,11 +130,26 @@ function placeOnLatLong(csvData, map) {
                 marker_groups[group] = [];
             }
             marker_groups[group].push(marker);
+
+            // Add click listener to each marker
+            marker.addListener("click", () => {
+                const contentString = `
+                    <div>
+                        <h3>${name}</h3>
+                            <li>Representative: ${row.Representative}</li>
+                            <li>Business Type: ${row.NaicsCode}</li>
+                        </ul>
+                    </div>
+                `;
+                infoWindow.close();
+                infoWindow.setContent(contentString);
+                infoWindow.open(marker.getMap(), marker);
+            });
         }
     });
-    console.log(marker_groups)
-}
 
+    console.log(marker_groups);
+}
 
 function loadMapShapes() {
     let infowindow = null;
