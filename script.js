@@ -8,32 +8,23 @@ let wards = {
     'Betsy Peters':'Ward 6'
     };
 let marker_groups = {};
-function ensureRender() {
-    requestAnimationFrame(() => {
-        google.maps.event.trigger(map, 'resize');
-    });
-}
 
 async function initMap() {
-    map = createMapDefinitions();
+    map = createMapDefinitions()
     let data;
 
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
+    // processData('ADDRESSES_WITH_WARD_LAT_LONG.csv',map)
 
+    // Ensure the map is fully loaded before calling loadMapShapes
     google.maps.event.addListenerOnce(map, 'idle', function() {
         loadMapShapes();
         placeOnLatLong(data, map);
         placeHeatMap(data, map);
 
-        // Trigger resize event to ensure proper rendering
-        google.maps.event.trigger(map, 'resize');
-
-        // Ensure render in the next animation frame
-        ensureRender();
     });
 
-    // Additional render trigger after a short delay
-    setTimeout(ensureRender, 1000);
+    
 }
 
 //UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
@@ -85,6 +76,8 @@ function placeHeatMap(data, map) {
         }
     });
 
+    console.log('Heatmap data:', heatmapData);
+
     var heatmap = new google.maps.visualization.HeatmapLayer({
         data: heatmapData,
         gradient: [
@@ -108,7 +101,6 @@ function placeHeatMap(data, map) {
     });
 
     heatmap.setMap(map);
-    console.log("Heatmap loaded")
 }
 
 
@@ -124,11 +116,12 @@ function placeOnLatLong(csvData, map) {
         const lat = parseFloat(row.Latitude);
         const lng = parseFloat(row.Longitude);
         const name = row.LocAcctName;
-        const group = wards[row.Representative]; // Assuming 'wards' is a typo and should be 'row.Name'
+        const group = wards[row.Name];
 
         if (!isNaN(lat) && !isNaN(lng)) {
             const marker = new google.maps.Marker({
                 position: { lat: lat, lng: lng },
+                map: map,
                 icon: markerIcon,
                 title: name
             });
@@ -143,7 +136,6 @@ function placeOnLatLong(csvData, map) {
                 const contentString = `
                     <div>
                         <h3>${name}</h3>
-                        <ul>
                             <li>Representative: ${row.Representative}</li>
                             <li>Business Type: ${row.NaicsCode}</li>
                         </ul>
@@ -151,13 +143,13 @@ function placeOnLatLong(csvData, map) {
                 `;
                 infoWindow.close();
                 infoWindow.setContent(contentString);
-                infoWindow.open(map, marker);
+                infoWindow.open(marker.getMap(), marker);
             });
         }
     });
 
+    console.log(marker_groups);
 }
-
 
 function loadMapShapes() {
     let infowindow = null;
@@ -253,7 +245,6 @@ function loadMapShapes() {
     map.data.addListener('mouseout', function(event) {
         map.data.revertStyle();
     });
-    console.log("Map shapes loaded");
 }
 
 async function loadCSV(url) {
@@ -269,19 +260,14 @@ async function loadCSV(url) {
     return filteredData;
 }
 
-function toggleGroup(id, group) {
-    const checkbox = document.getElementById(id);
-    if (checkbox.checked) {
-        if (marker_groups[group]) {
-            marker_groups[group].forEach(marker => marker.setMap(map));
-        }
-    } else {
-        if (marker_groups[group]) {
-            marker_groups[group].forEach(marker => marker.setMap(null));
-        }
+function toggleGroup(group) {
+    if (marker_groups[group]) {
+        marker_groups[group].forEach(marker => {
+            if (marker.getMap()) {
+                marker.setMap(null);
+            } else {
+                marker.setMap(map);
+            }
+        });
     }
-}
-function simulateScroll() {
-    window.scrollTo(0, 1);
-    window.scrollTo(0, 0);
 }
