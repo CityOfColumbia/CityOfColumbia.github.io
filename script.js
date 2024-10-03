@@ -1,4 +1,4 @@
-let map;
+let map
 let wards = {
     'Lisa Meyer':'Ward 2', 
     'Nick Foster':'Ward 4', 
@@ -17,17 +17,15 @@ async function initMap() {
     // processData('ADDRESSES_WITH_WARD_LAT_LONG.csv',map)
 
     // Ensure the map is fully loaded before calling loadMapShapes
-    google.maps.event.addListenerOnce(map, 'idle', function() {
-        loadMapShapes();
-        placeOnLatLong(data, map);
-        placeHeatMap(data, map);
 
-    });
+    loadMapShapes();
+    placeOnLatLong(data, map);
+    placeHeatMap(data, map);
+
+
 
     
 }
-
-//UPDATE THIS, THIS SHOULD BE A FUNCTION WHICH FILLS THE DICTIONARY EVENTUALLY FROM AN INPUT CSV
 
 function createMapDefinitions(){
     return new google.maps.Map(document.getElementById('map'), {
