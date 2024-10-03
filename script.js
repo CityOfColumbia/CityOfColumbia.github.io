@@ -116,7 +116,7 @@ function placeOnLatLong(csvData, map) {
         const lat = parseFloat(row.Latitude);
         const lng = parseFloat(row.Longitude);
         const name = row.LocAcctName;
-        const group = wards[row.Name];
+        const group = wards[row.Representative];
 
         if (!isNaN(lat) && !isNaN(lng)) {
             const marker = new google.maps.Marker({
@@ -130,7 +130,6 @@ function placeOnLatLong(csvData, map) {
                 marker_groups[group] = [];
             }
             marker_groups[group].push(marker);
-
             // Add click listener to each marker
             marker.addListener("click", () => {
                 const contentString = `
@@ -148,7 +147,7 @@ function placeOnLatLong(csvData, map) {
         }
     });
 
-    console.log(marker_groups);
+
 }
 
 function loadMapShapes() {
