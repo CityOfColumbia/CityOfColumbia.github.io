@@ -1,7 +1,7 @@
-name,value,value,value2
-Lisa Meyer,'TEST1',,,
-Nick Foster,'TEST2',,,
-Valerie Carroll,'TEST3','Test4',,
-Roy Lovelady,'TEST10',,,
-Donald Waterman,,,,
-Betsy Peters,,,,
+name,Sales Revenue,CIP Expenditure
+Lisa Meyer,'100000',,,
+Nick Foster,'20000',,,
+Valerie Carroll,'314222','Test4',,
+Roy Lovelady,'53111',,,
+Donald Waterman,'63424',,,
+Betsy Peters,'45612345',,,
