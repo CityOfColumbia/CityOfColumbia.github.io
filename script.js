@@ -129,6 +129,7 @@ function placeOnLatLong(csvData, map) {
                 const contentString = `
                     <div>
                         <h3>${name}</h3>
+                            <li>Address: ${row.Address}</li>
                             <li>Representative: ${row.Representative}</li>
                             <li>Business Type: ${row.NaicsCode}</li>
                         </ul>
@@ -159,10 +160,21 @@ function loadMapShapes() {
                 const name = values[0];
                 featureData[name] = {};
                 headers.forEach((header, index) => {
-                    featureData[name][header] = values[index];
+                    let value = values[index];
+                    let parsedValue = parseFloat(value);
+                    if (Number.isInteger(parsedValue)) {
+                        value = `$${parsedValue.toLocaleString()}`; // Format the number with commas and add a dollar sign
+                    }
+                    featureData[name][header] = value;
                 });
+                
             });
         });
+    map.data.loadGeoJson("WardOutlines.geojson");
+
+
+
+
     map.data.loadGeoJson("WardOutlines.geojson");
 
     // Set the style for the polygons
