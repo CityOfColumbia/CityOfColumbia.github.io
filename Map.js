@@ -14,10 +14,6 @@ async function initMap() {
     let data;
 
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
-    // processData('ADDRESSES_WITH_WARD_LAT_LONG.csv',map)
-
-    // Ensure the map is fully loaded before calling loadMapShapes
-
     loadMapShapes();
     placeOnLatLong(data, map);
     placeHeatMap(data, map);
@@ -167,7 +163,6 @@ function loadMapShapes() {
                 });
             });
         });
-    // Load US state outline polygons from a GeoJson file
     map.data.loadGeoJson("WardOutlines.geojson");
 
     // Set the style for the polygons
