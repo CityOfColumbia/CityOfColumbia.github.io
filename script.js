@@ -8,6 +8,7 @@ let wards = {
     'Betsy Peters':'Ward 6'
     };
 let marker_groups = {};
+let groupVisibility = {};
 
 async function initMap() {
     map = createMapDefinitions()
@@ -17,6 +18,9 @@ async function initMap() {
     loadMapShapes();
     placeOnLatLong(data, map);
     placeHeatMap(data, map);
+    for(group in marker_groups){
+        groupVisibility[group] = true;
+    }
 
 
 
@@ -30,7 +34,6 @@ function createMapDefinitions(){
         mapTypeId: 'roadmap',
         mapTypeControl: false,
         streetViewControl: false,
-        minZoom:10,
         styles: [
             { elementType: 'geometry', stylers: [{ color: '#212121' }] },
             { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
@@ -163,11 +166,10 @@ function loadMapShapes() {
                     let value = values[index];
                     let parsedValue = parseFloat(value);
                     if (Number.isInteger(parsedValue)) {
-                        value = `$${parsedValue.toLocaleString()}`; // Format the number with commas and add a dollar sign
+                        value = parsedValue.toLocaleString(); // Format the number with commas
                     }
                     featureData[name][header] = value;
                 });
-                
             });
         });
     map.data.loadGeoJson("WardOutlines.geojson");
@@ -264,14 +266,43 @@ async function loadCSV(url) {
     return filteredData;
 }
 
+function toggleAll() {
+    let allOn = true;
+    for (let group in marker_groups) {
+        if (!groupVisibility[group]) {
+            allOn = false;
+            break;
+        }
+    }
+
+    for (let group in marker_groups) {
+        groupVisibility[group] = !allOn;
+        marker_groups[group].forEach(marker => {
+            marker.setMap(groupVisibility[group] ? map : null);
+        });
+    }
+
+    // Update the checkboxes
+    for (let i = 1; i <= 6; i++) {
+        document.getElementById(`ward${i}`).checked = !allOn;
+    }
+    document.getElementById('all').checked = !allOn;
+}
+
 function toggleGroup(group) {
     if (marker_groups[group]) {
+        // Toggle the visibility state
+        groupVisibility[group] = !groupVisibility[group]
         marker_groups[group].forEach(marker => {
-            if (marker.getMap()) {
-                marker.setMap(null);
+            if (groupVisibility[group]) {
+                marker.setMap(map); // Show marker
             } else {
-                marker.setMap(map);
+                marker.setMap(null); // Hide marker
             }
         });
     }
+}
+
+function isGroupVisible(group) {
+    return groupVisibility[group] || false;
 }
