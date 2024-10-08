@@ -166,13 +166,13 @@ function loadMapShapes() {
                     let value = values[index];
                     let parsedValue = parseFloat(value);
                     if (Number.isInteger(parsedValue)) {
-                        value = parsedValue.toLocaleString(); // Format the number with commas
+                        value = '$'+ parsedValue.toLocaleString(); // Format the number with commas
                     }
                     featureData[name][header] = value;
                 });
             });
         });
-    map.data.loadGeoJson("WardOutlines.geojson");
+
 
 
 
