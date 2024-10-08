@@ -153,7 +153,7 @@ function loadMapShapes() {
     let featureData = {};
 
     // Load CSV data
-    fetch('data.csv')
+    fetch('data.csv') //change the name of the .csv which is used to something more intutuitive, like "polygonData.csv"
         .then(response => response.text())
         .then(csvText => {
             const rows = csvText.split('\n');
@@ -182,6 +182,7 @@ function loadMapShapes() {
     // Set the style for the polygons
     map.data.setStyle({
         fillColor: '#FFFFFF', // Change this to your desired hex color
+        fillOpacity: 0,
         strokeColor: '#FFFFFF', // Change this to your desired hex color
         strokeWeight: 2
     });
