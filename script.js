@@ -304,11 +304,11 @@ function loadWardOutlines(GeoJson) {
     //This listener is to ensure polygons and markers turn off once the user zooms out far enough
     map.addListener('zoom_changed', function() {
         const mapZoom = map.getZoom()
-        if(mapZoom < 11 && polygonsVisible == true){
+        if(mapZoom < 9 && polygonsVisible == true){
         togglePolygons()
         toggleMarkers()
         polygonsVisible = !polygonsVisible}
-        else if(mapZoom >= 10 && polygonsVisible == false){
+        else if(mapZoom >= 8 && polygonsVisible == false){
             togglePolygons()
             toggleMarkers()
             polygonsVisible = !polygonsVisible
