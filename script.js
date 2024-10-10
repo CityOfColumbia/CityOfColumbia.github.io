@@ -45,6 +45,7 @@ async function initMap() {
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
     loadBooneCounty('Boone-County_MO.geojson');
     loadWardOutlines();
+
     placeOnLatLong(data, map);
     placeHeatMap(data, map);
     for(group in marker_groups){
@@ -189,15 +190,41 @@ function loadBooneCounty(GeoJson){
     map.data.loadGeoJson(GeoJson, null, function(features){
         features.forEach(function(feature) {
             feature.setProperty('visible', true);
+            console.log(feature.getProperty('Name'))
           });
         });
+        let infowindow = null;
+        map.data.addListener('click', function(event) {
+            const featureName = event.feature.getProperty('Name');
+        
+            // Check if the feature's name is in the targetNames array
+            if (featureName != "Boone County") {
+                return; // Exit the function if the feature's name is not in the list
+            }
+        
+            if (infowindow) {
+                infowindow.close();
+            }
+        
+            
+        
+            const content = `<div style="font-weight: bold;">${featureName}</div>`;
+        
+            infowindow = new google.maps.InfoWindow({
+                content: content,
+                position: event.latLng,
+                disableAutoPan: true
+            });
+            infowindow.open(map);
+        });
+        
 }
 
-function loadWardOutlines(GeoJson) {
+function loadWardOutlines(GeoJson, WardData) {
     let infowindow = null;
     let featureData = {};
     let polygonsVisible = true;
-    // Load CSV data
+    //This portion fetches the given WardData csv, and will assign data according to the feature name. Note, the GeoJson for the Wards must have the features named by their representative
     fetch('data.csv')
         .then(response => response.text())
         .then(csvText => {
@@ -238,21 +265,26 @@ function loadWardOutlines(GeoJson) {
 
     // Adds a listener to display an information table when a polygon is clicked
     map.data.addListener('click', function(event) {
+        const featureName = event.feature.getProperty('Name');
+    
+        // Check if the feature's name is in the targetNames array
+        if (!(featureName in wards)) {
+            return; // Exit the function if the feature's name is not in the list
+        }
+    
         if (infowindow) {
             infowindow.close();
         }
-
-        const featureName = event.feature.getProperty('Name');
+    
         const featureInfo = featureData[featureName] || {};
         const geometry = event.feature.getGeometry();
         const bounds = new google.maps.LatLngBounds();
         geometry.forEachLatLng(function(latlng) {
             bounds.extend(latlng);
         });
-
+    
         const center = bounds.getCenter();
-
-        // Create custom content for the info window on each polygon
+    
         let content = `
             <title>Feature Info Table</title>
             <style>
@@ -272,7 +304,7 @@ function loadWardOutlines(GeoJson) {
             <table id="infoTable">
             <caption style="font-weight: bold">${wards[featureName]}</caption>
                 <tbody>`;
-
+    
         for (const [property, value] of Object.entries(featureInfo)) {
             content += `
                     <tr>
@@ -280,18 +312,19 @@ function loadWardOutlines(GeoJson) {
                         <td>${value ? value : 'N/A'}</td>
                     </tr>`;
         }
-
+    
         content += `
                 </tbody>
             </table>`;
-
+    
         infowindow = new google.maps.InfoWindow({
             content: content,
             position: center,
-            disableAutoPan: true // Prevent the map from panning when the info window opens
+            disableAutoPan: true
         });
         infowindow.open(map);
     });
+    
 
     // Add a hover listener to change the cursor
     map.data.addListener('mouseover', function(event) {
