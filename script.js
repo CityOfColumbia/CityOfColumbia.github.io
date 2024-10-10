@@ -43,8 +43,8 @@ async function initMap() {
     let data;
 
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
-    loadWardOutlines();
     loadBooneCounty('Boone-County_MO.geojson');
+    loadWardOutlines();
     placeOnLatLong(data, map);
     placeHeatMap(data, map);
     for(group in marker_groups){
