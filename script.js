@@ -7,21 +7,51 @@ let wards = {
     'Donald Waterman':'Ward 5',
     'Betsy Peters':'Ward 6'
     };
-let marker_groups = {};
-let groupVisibility = {};
+let marker_groups = {}; // KEY:DATA -> Ward #NUMBER = [marker1 ...]
+let groupVisibility = {}; // KEY:DATA
+let heatMapZooms = {
+    1:5,
+    2:5,
+    3:5,
+    4:5,
+    5:5,
+    6:8,
+    7:10,
+    8:20,
+    9:30,
+    10:30,
+    11:30,
+    12:40,
+    13:40,
+    14:40,
+    15:40,
+    16:40,
+    17:40,
+    18:40,
+    19:40,
+    20:40,
+    21:40,
+    22:40
+}
+// Function looks up which radius corresponds to which zoom level
+function getRadius(zoom) {
+    return heatMapZooms[zoom]
+}
 
 async function initMap() {
     map = createMapDefinitions()
     let data;
 
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
-    loadMapShapes();
+    loadWardOutlines();
+    loadBooneCounty('Boone-County_MO.geojson');
     placeOnLatLong(data, map);
     placeHeatMap(data, map);
     for(group in marker_groups){
         groupVisibility[group] = true;
     }
 
+    // Adjust the radius when the zoom level changes
 
 
     
@@ -29,7 +59,7 @@ async function initMap() {
 
 function createMapDefinitions(){
     return new google.maps.Map(document.getElementById('map'), {
-        zoom: 12.5,
+        zoom: 13,
         center: {lat: 38.947907, lng: -92.323575},
         mapTypeId: 'roadmap',
         mapTypeControl: false,
@@ -93,13 +123,17 @@ function placeHeatMap(data, map) {
             'rgba(191, 0, 31, 1)',
             'rgba(255, 0, 0, 1)'
         ],
-        radius: 40,
+        radius: getRadius(map.getZoom()),
         opacity: 1
     });
 
     heatmap.setMap(map);
-}
+    map.addListener('zoom_changed', function() {
+        heatmap.set('radius', getRadius(map.getZoom()));
 
+    });
+
+}
 
 function placeOnLatLong(csvData, map) {
     const infoWindow = new google.maps.InfoWindow();
@@ -142,18 +176,29 @@ function placeOnLatLong(csvData, map) {
                 infoWindow.setContent(contentString);
                 infoWindow.open(marker.getMap(), marker);
             });
+            map.addListener('zoom_changed', function(){
+
+            })
         }
     });
 
 
 }
 
-function loadMapShapes() {
+function loadBooneCounty(GeoJson){
+    map.data.loadGeoJson(GeoJson, null, function(features){
+        features.forEach(function(feature) {
+            feature.setProperty('visible', true);
+          });
+        });
+}
+
+function loadWardOutlines(GeoJson) {
     let infowindow = null;
     let featureData = {};
-
+    let polygonsVisible = true;
     // Load CSV data
-    fetch('data.csv') //change the name of the .csv which is used to something more intutuitive, like "polygonData.csv"
+    fetch('data.csv')
         .then(response => response.text())
         .then(csvText => {
             const rows = csvText.split('\n');
@@ -177,7 +222,11 @@ function loadMapShapes() {
 
 
 
-    map.data.loadGeoJson("WardOutlines.geojson");
+    map.data.loadGeoJson("WardOutlines.geojson", null, function(features){
+        features.forEach(function(feature) {
+            feature.setProperty('visible', true);
+          });
+        });
 
     // Set the style for the polygons
     map.data.setStyle({
@@ -187,7 +236,7 @@ function loadMapShapes() {
         strokeWeight: 2
     });
 
-    // Add a click listener to the features
+    // Adds a listener to display an information table when a polygon is clicked
     map.data.addListener('click', function(event) {
         if (infowindow) {
             infowindow.close();
@@ -203,7 +252,7 @@ function loadMapShapes() {
 
         const center = bounds.getCenter();
 
-        // Create custom content for the info window
+        // Create custom content for the info window on each polygon
         let content = `
             <title>Feature Info Table</title>
             <style>
@@ -248,10 +297,53 @@ function loadMapShapes() {
     map.data.addListener('mouseover', function(event) {
         map.data.overrideStyle(event.feature, { cursor: 'pointer' });
     });
-
     map.data.addListener('mouseout', function(event) {
         map.data.revertStyle();
     });
+
+    //This listener is to ensure polygons and markers turn off once the user zooms out far enough
+    map.addListener('zoom_changed', function() {
+        const mapZoom = map.getZoom()
+        if(mapZoom < 11 && polygonsVisible == true){
+        togglePolygons()
+        toggleMarkers()
+        polygonsVisible = !polygonsVisible}
+        else if(mapZoom >= 10 && polygonsVisible == false){
+            togglePolygons()
+            toggleMarkers()
+            polygonsVisible = !polygonsVisible
+        }
+    });
+
+}
+
+//This function is used to toggle polygons on and off as the map is being zoomed out
+function togglePolygons(){
+
+        map.data.forEach(function(feature) {
+          const isVisible = feature.getProperty('visible');
+          console.log(isVisible)
+          feature.setProperty('visible', !isVisible);
+        });
+
+        map.data.setStyle(function(feature) {
+          return {
+            fillColor: '#FFFFFF', // Change this to your desired hex color
+            fillOpacity: 0,
+            strokeColor: '#FFFFFF', // Change this to your desired hex color
+            strokeWeight: 2,
+            visible: feature.getProperty('visible')
+          };
+        });
+      }
+
+//This function is used to toggle markers on and off as the map is being zoomed out
+function toggleMarkers(){
+        for (let i = 1; i <= 6; i++) {
+            if(document.getElementById(`Ward ${i}`).checked == true){
+                toggleGroup(`Ward ${i}`)
+        }
+    }
 }
 
 async function loadCSV(url) {
@@ -267,6 +359,7 @@ async function loadCSV(url) {
     return filteredData;
 }
 
+//This function is used to toggle the markers for the toggle all check box
 function toggleAll() {
     let allOn = true;
     for (let group in marker_groups) {
@@ -285,7 +378,7 @@ function toggleAll() {
 
     // Update the checkboxes
     for (let i = 1; i <= 6; i++) {
-        document.getElementById(`ward${i}`).checked = !allOn;
+        document.getElementById(`Ward ${i}`).checked = !allOn;
     }
     document.getElementById('all').checked = !allOn;
 }
