@@ -164,12 +164,16 @@ function placeOnLatLong(csvData, map) {
             marker_groups[group].push(marker);
             // Add click listener to each marker
             marker.addListener("click", () => {
+                const [numberPart, descriptionPart] = row.NaicsCode.split(' - ');
                 const contentString = `
                     <div>
                         <h3>${name}</h3>
+                        <ul>
                             <li>Address: ${row.Address}</li>
-                            <li>Representative: ${row.Representative}</li>
-                            <li>Business Type: ${row.NaicsCode}</li>
+                            <li>Ward: ${wards[row.Representative]}</li>
+                            <li>Business Type: ${descriptionPart}</li>
+                            <li>NAICS Code: ${numberPart}</li>
+
                         </ul>
                     </div>
                 `;
