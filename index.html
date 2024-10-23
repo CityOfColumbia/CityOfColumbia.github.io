@@ -4,8 +4,7 @@
     <title>Business Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-
-    <script src="script.js" ></script>
+    <script src="script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXFye0a95qdi9jgrsp6UDVAlR6UaMV2r0&loading=async&libraries=visualization&callback=initMap" async defer></script>
 
     <style>
@@ -14,15 +13,42 @@
             margin: 0;
             padding: 0;
         }
+        .feature-table{
+            display: none;            
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
         #map {
             height: 100%;
             width: 100%;
-
         }
-        #controls {
+        #business-controls {
             position: absolute;
             top: 10px;
             left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
+        #demographic-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
+        #feature-toggle {
+            position: absolute;
+            bottom: 10px;
+            right: 10px; /* Changed from left to right */
             background-color: #f9f9f9;
             padding: 10px;
             z-index: 5;
@@ -32,8 +58,7 @@
 </head>
 <body>
     <div id="map"></div>
-    <script></script>
-    <div id="controls">
+    <div id="business-controls" class="parent-feature-table" style="display: block;">
         <table>
             <tr>
                 <td><input type="checkbox" id="Ward 1" onclick="toggleGroup('Ward 1')" checked> Ward 1</td>
@@ -43,8 +68,44 @@
                 <td><input type="checkbox" id="Ward 5" onclick="toggleGroup('Ward 5')" checked> Ward 5</td>
                 <td><input type="checkbox" id="Ward 6" onclick="toggleGroup('Ward 6')" checked> Ward 6</td>
                 <td><input type="checkbox" id="all" onclick="toggleAll()"> All</td>
-
             </tr>
         </table>
+    </div>
+    <div id="feature-toggle">
+        <label><input type="radio" name="feature" value="Demographic" onclick="showFeatures('Demographic')"> Demographics</label><br>
+        <label><input type="radio" name="feature" value="Business" onclick="showFeatures('Business')" checked> Business</label>
+    </div>
+    <div id="demographic-controls" class="parent-feature-table" style="display: none;">
+        <input type="radio" id="race" name="demographic" onclick="showTable('race-controls')"> Race
+        <input type="radio" id="age" name="demographic" onclick="showTable('age-controls')"> Age
+        <input type="radio" id="sex" name="demographic" onclick="showTable('sex-controls')"> Sex
+    </div>
+
+    <div id="race-controls" class="feature-table">
+        <table>
+            <tr>
+                <td><input type="radio" id="Black" name="race" onclick="setDemographicMapStyle('Black')"> Black</td>
+                <td><input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="age-controls" class="feature-table">
+        <table>
+            <tr>
+                <td><input type="radio" id="child" name="age" onclick="setDemographicMapStyle('child')"> Child</td>
+                <td><input type="radio" id="adult" name="age" onclick="setDemographicMapStyle('adult')"> Adult</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="sex-controls" class="feature-table">
+        <table>
+            <tr>
+                <td><input type="radio" id="male" name="sex" onclick="setDemographicMapStyle('male')"> Male</td>
+                <td><input type="radio" id="female" name="sex" onclick="setDemographicMapStyle('female')"> Female</td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>
