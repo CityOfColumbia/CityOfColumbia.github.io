@@ -139,7 +139,7 @@ function placeHeatMap(data, map) {
 function placeOnLatLong(csvData, map) {
     const infoWindow = new google.maps.InfoWindow();
     const markerIcon = {
-        url: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3255658/square-rotated-icon-md.png",
+        url: "https://www.svgrepo.com/download/325321/keyframe.svg",
         scaledSize: new google.maps.Size(10, 10) // Adjust the size as needed
     };
 
