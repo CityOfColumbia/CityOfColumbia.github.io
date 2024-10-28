@@ -7,8 +7,11 @@ let wards = {
     'Donald Waterman':'Ward 5',
     'Betsy Peters':'Ward 6'
     };
+
 let marker_groups = {}; // KEY:DATA -> Ward #NUMBER = [marker1 ...]
 let groupVisibility = {}; // KEY:DATA
+let CIPExpenditures = {}
+let wardRevenues = {}
 let heatMapZooms = {
     1:5,
     2:5,
@@ -43,7 +46,7 @@ async function initMap() {
     let data;
 
     data = await loadCSV('ADDRESSES_WITH_WARD_LAT_LONG.csv');
-    loadBooneCounty('Boone-County_MO.geojson');
+    // loadBooneCounty('Boone-County_MO.geojson');
     loadWardOutlines();
 
     placeOnLatLong(data, map);
@@ -51,12 +54,30 @@ async function initMap() {
     for(group in marker_groups){
         groupVisibility[group] = true;
     }
-
+    getCIPExpenditures('CIPTest.csv')
+    console.log("CIP Expenditures!",CIPExpenditures)
     // Adjust the radius when the zoom level changes
 
 
     
 }
+
+async function getCIPExpenditures(csvURL) {
+    const data = await loadCSV(csvURL);
+
+    data.forEach(row => {
+        const ward = row["Ward"];
+        const expenditure = Math.floor(parseFloat(row["CIP Expenditure"]));
+
+        if (!CIPExpenditures[ward]) {
+            CIPExpenditures[ward] = 0;
+        }
+
+        CIPExpenditures[ward] += expenditure;
+    });
+
+}
+
 
 function createMapDefinitions(){
     return new google.maps.Map(document.getElementById('map'), {
@@ -224,11 +245,15 @@ function loadBooneCounty(GeoJson){
         
 }
 
-function loadWardOutlines(GeoJson, WardData) {
+async function loadWardOutlines(GeoJson, WardData) {
     let infowindow = null;
     let featureData = {};
     let polygonsVisible = true;
-    //This portion fetches the given WardData csv, and will assign data according to the feature name. Note, the GeoJson for the Wards must have the features named by their representative
+
+    // Fetch and process the CIP expenditures
+    await getCIPExpenditures('CIPTest.csv');
+
+    // Fetch the WardData CSV and assign data according to the feature name
     fetch('data.csv')
         .then(response => response.text())
         .then(csvText => {
@@ -242,22 +267,29 @@ function loadWardOutlines(GeoJson, WardData) {
                     let value = values[index];
                     let parsedValue = parseFloat(value);
                     if (Number.isInteger(parsedValue)) {
-                        value = '$'+ parsedValue.toLocaleString(); // Format the number with commas
+                        value = '$' + parsedValue.toLocaleString(); // Format the number with commas
                     }
                     featureData[name][header] = value;
                 });
             });
+
+            // Add CIP Expenditures to featureData
+            for (const ward in CIPExpenditures) {
+                const wardName = ward;
+                if (!featureData[wardName]) {
+                    featureData[wardName] = {};
+                }
+                featureData[wardName]['CIP Expenditure'] = `$${CIPExpenditures[ward].toLocaleString()}`;
+            }
         });
-
-
-
-
-
-    map.data.loadGeoJson("WardOutlines.geojson", null, function(features){
+        console.log("FeatureData!", featureData)
+        console.log("object entires",Object.entries(featureData))
+        console.log("CIP Expenditure", CIPExpenditures)
+    map.data.loadGeoJson("WardOutlines.geojson", null, function(features) {
         features.forEach(function(feature) {
             feature.setProperty('visible', true);
-          });
         });
+    });
 
     // Set the style for the polygons
     map.data.setStyle({
@@ -270,25 +302,25 @@ function loadWardOutlines(GeoJson, WardData) {
     // Adds a listener to display an information table when a polygon is clicked
     map.data.addListener('click', function(event) {
         const featureName = event.feature.getProperty('Name');
-    
+
         // Check if the feature's name is in the targetNames array
         if (!(featureName in wards)) {
             return; // Exit the function if the feature's name is not in the list
         }
-    
+
         if (infowindow) {
             infowindow.close();
         }
-    
+
         const featureInfo = featureData[featureName] || {};
         const geometry = event.feature.getGeometry();
         const bounds = new google.maps.LatLngBounds();
         geometry.forEachLatLng(function(latlng) {
             bounds.extend(latlng);
         });
-    
+
         const center = bounds.getCenter();
-    
+
         let content = `
             <title>Feature Info Table</title>
             <style>
@@ -308,7 +340,7 @@ function loadWardOutlines(GeoJson, WardData) {
             <table id="infoTable">
             <caption style="font-weight: bold">${wards[featureName]}</caption>
                 <tbody>`;
-    
+
         for (const [property, value] of Object.entries(featureInfo)) {
             content += `
                     <tr>
@@ -316,11 +348,11 @@ function loadWardOutlines(GeoJson, WardData) {
                         <td>${value ? value : 'N/A'}</td>
                     </tr>`;
         }
-    
+
         content += `
                 </tbody>
             </table>`;
-    
+
         infowindow = new google.maps.InfoWindow({
             content: content,
             position: center,
@@ -328,7 +360,6 @@ function loadWardOutlines(GeoJson, WardData) {
         });
         infowindow.open(map);
     });
-    
 
     // Add a hover listener to change the cursor
     map.data.addListener('mouseover', function(event) {
@@ -338,20 +369,19 @@ function loadWardOutlines(GeoJson, WardData) {
         map.data.revertStyle();
     });
 
-    //This listener is to ensure polygons and markers turn off once the user zooms out far enough
+    // This listener is to ensure polygons and markers turn off once the user zooms out far enough
     map.addListener('zoom_changed', function() {
-        const mapZoom = map.getZoom()
-        if(mapZoom < 9 && polygonsVisible == true){
-        togglePolygons()
-        toggleMarkers()
-        polygonsVisible = !polygonsVisible}
-        else if(mapZoom >= 8 && polygonsVisible == false){
-            togglePolygons()
-            toggleMarkers()
-            polygonsVisible = !polygonsVisible
+        const mapZoom = map.getZoom();
+        if (mapZoom < 9 && polygonsVisible == true) {
+            togglePolygons();
+            toggleMarkers();
+            polygonsVisible = !polygonsVisible;
+        } else if (mapZoom >= 8 && polygonsVisible == false) {
+            togglePolygons();
+            toggleMarkers();
+            polygonsVisible = !polygonsVisible;
         }
     });
-
 }
 
 //This function is used to toggle polygons on and off as the map is being zoomed out
