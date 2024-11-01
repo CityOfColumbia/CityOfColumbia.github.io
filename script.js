@@ -16,11 +16,13 @@ class EventListenerManager {
     constructor(mapManager){
         this.eventListeners = [];
 
+
     }
 
     addListener(listener){
         this.eventListeners.push(listener)
     }
+
 
     showListeners(){
         console.log("Event Listeners!", this.eventListeners)
@@ -33,6 +35,7 @@ class EventListenerManager {
         });
         this.eventListeners = [];
     }
+
 }
     
 
@@ -302,6 +305,7 @@ class MarkersManager {
                 if (groupVisibility[group]) {
                     marker.setMap(this.mapManager.map); // Show marker
 
+
                 } else {
                     marker.setMap(null); // Hide marker
                 }
@@ -382,6 +386,7 @@ class BusinessMarkers extends MarkersManager{
                     values.push(numberPart, descriptionPart, true, lat, long)
                 } else {
                     values.push(null,null, true, lat, long)
+
                 }
 
                 this.markerDataList.push(this.addMarkerData(keys,values));
@@ -453,6 +458,7 @@ class BusinessMarkers extends MarkersManager{
         });
     }
     
+
 
     showMarkers(){
         console.log(this.markerDataList)
