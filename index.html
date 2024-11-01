@@ -4,8 +4,7 @@
     <title>Business Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-
-    <script src="script.js" ></script>
+    <script src="script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXFye0a95qdi9jgrsp6UDVAlR6UaMV2r0&loading=async&libraries=visualization&callback=initMap" async defer></script>
 
     <style>
@@ -14,12 +13,24 @@
             margin: 0;
             padding: 0;
         }
+
+        /* .feature-table {
+            display: none;            
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        } */
+
         #map {
             height: 100%;
             width: 100%;
-
         }
-        #controls {
+
+        #business-controls {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -28,23 +39,108 @@
             z-index: 5;
             border: 1px solid #ccc;
         }
+
+        #demographic-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
+
+        #feature-toggle {
+            position: absolute;
+            bottom: 10px;
+            right: 10px; /* Changed from left to right */
+            background-color: #f9f9f9;
+            padding: 10px;
+            z-index: 5;
+            border: 1px solid #ccc;
+        }
+
+        /* New styles for the parent container */
+        .parent-feature-table {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* New styles for the table */
+        .parent-feature-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* New styles for the table cells */
+        .parent-feature-table td {
+            padding: 5px;
+            text-align: left;
+        }
+
+        /* Optional: Add some hover effects for better UX */
+        .parent-feature-table input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .parent-feature-table input[type="radio"]:hover {
+            cursor: pointer;
+}
+
     </style>
 </head>
 <body>
+
     <div id="map"></div>
-    <script></script>
-    <div id="controls">
+
+    <div id="business-controls" class="parent-feature-table" style="display: block;">
         <table>
             <tr>
-                <td><input type="checkbox" id="Ward 1" onclick="toggleGroup('Ward 1')" checked> Ward 1</td>
-                <td><input type="checkbox" id="Ward 2" onclick="toggleGroup('Ward 2')" checked> Ward 2</td>
-                <td><input type="checkbox" id="Ward 3" onclick="toggleGroup('Ward 3')" checked> Ward 3</td>
-                <td><input type="checkbox" id="Ward 4" onclick="toggleGroup('Ward 4')" checked> Ward 4</td>
-                <td><input type="checkbox" id="Ward 5" onclick="toggleGroup('Ward 5')" checked> Ward 5</td>
-                <td><input type="checkbox" id="Ward 6" onclick="toggleGroup('Ward 6')" checked> Ward 6</td>
-                <td><input type="checkbox" id="all" onclick="toggleAll()"> All</td>
-
+                <td><input type="checkbox" id="Ward 1" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 1')" checked> Ward 1</td>
+                <td><input type="checkbox" id="Ward 2" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 2')" checked> Ward 2</td>
+                <td><input type="checkbox" id="Ward 3" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 3')" checked> Ward 3</td>
+                <td><input type="checkbox" id="Ward 4" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 4')" checked> Ward 4</td>
+                <td><input type="checkbox" id="Ward 5" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 5')" checked> Ward 5</td>
+                <td><input type="checkbox" id="Ward 6" onclick="mapManager.markerManager.toggleGroup('Ward', 'Ward 6')" checked> Ward 6</td>
+                <td><input type="checkbox" id="all" onclick="mapManager.markerManager.toggleAll()" checked> All</td>
             </tr>
         </table>
+    </div>
+
+    <div id="feature-toggle">
+        <label><input type="radio" name="feature" value="Demographic" onclick="showFeatures('Demographic')"> Demographics</label><br>
+        <label><input type="radio" name="feature" value="Business" onclick="showFeatures('Business')" checked> Business</label>
+    </div>
+
+    <div id="demographic-controls" class="parent-feature-table" style="display: none; position: absolute; top: 0; left: 0;">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <input type="radio" id="race" name="demographic" onclick="showTable('race-controls')"> Race
+                    <input type="radio" id="age" name="demographic" onclick="showTable('age-controls')"> Age
+                    <input type="radio" id="sex" name="demographic" onclick="showTable('sex-controls')"> Sex
+                </td>
+            </tr>
+            <tr id="race-controls" class="feature-table" style="display: none;">
+                <td><input type="radio" id="Black" name="race" onclick="setDemographicMapStyle('Black')"> Black</td>
+                <td><input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White</td>
+            </tr>
+            <tr id="age-controls" class="feature-table" style="display: none;">
+                <td><input type="radio" id="child" name="age" onclick="setDemographicMapStyle('Child')"> Child</td>
+                <td><input type="radio" id="adult" name="age" onclick="setDemographicMapStyle('Adult')"> Adult</td>
+            </tr>
+            <tr id="sex-controls" class="feature-table" style="display: none;">
+                <td><input type="radio" id="male" name="sex" onclick="setDemographicMapStyle('Male')"> Male</td>
+                <td><input type="radio" id="female" name="sex" onclick="setDemographicMapStyle('Female')"> Female</td>
+            </tr>
+        </table>
+    </div>
+    
 </body>
 </html>
