@@ -23,7 +23,7 @@ jobs:
 
     - name: Replace API key in HTML
       run: |
-        sed 's/{API_KEY}/${{ secrets.API_KEY }}/g' index.template.html > index.html
+        sed 's/{API_KEY}/${{ secrets.API_KEY }}/g' index.html > index.html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
