@@ -12,10 +12,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Debug Git
+      run: |
+        git config --global --add safe.directory /github/workspace
+        git remote -v
+        git branch -a
 
     - name: Replace API key in HTML
       run: |
-        sed -i 's/{API_KEY}/${{ secrets.API_KEY }}/g' index.html
+        sed 's/API_KEY_PLACEHOLDER/${{ secrets.API_KEY }}/g' index.template.html > index.html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
