@@ -8,6 +8,7 @@ let wards = {
     'Roy Lovelady':'Ward 3', 
     'Donald Waterman':'Ward 5',
     'Betsy Peters':'Ward 6'
+    
     };
 
 let NAICS_Categories = {
