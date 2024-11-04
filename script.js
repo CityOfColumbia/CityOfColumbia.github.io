@@ -508,7 +508,12 @@ class PolygonManager {
         this.polygonsVisible = true;
         this.managerID = managerID;
         this.polygons = {};
+        this.loadBoonecounty();
         this.loadGeoJson();
+    }
+
+    async loadBoonecounty(){
+        this.mapManager.map.data.loadGeoJson('Boone-county_MO.geojson')
     }
 
     async loadGeoJson() {
