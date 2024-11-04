@@ -10,6 +10,33 @@ let wards = {
     'Betsy Peters':'Ward 6'
     };
 
+let NAICS_Categories = {
+    11:"Agriculture, Forestry, Fishing, and Hunting",
+    21:"Mining",
+    22:"Utilities",
+    23:"Construction",
+    31:"Manufacturing",
+    32:"Manufacturing",
+    33:"Manufacturing",
+    42:"Wholesale Trade",
+    44:"Retail Trade",
+    45:"Retail Trade",
+    48:"Transportation and Warehousing",
+    49:"Transportation and Warehousing",
+    51:"Information",
+    52:"Finance and Insurance",
+    53:"Real Estate Rental and Leasing",
+    54:"Professional, Scientific, and Technical Services",
+    55:"Management of Companies and Enterprises",
+    56:"Administrative and Support and Waste Management and Remediation Services",
+    61:"Educational Services",
+    62:"Health Care and Social Assistance",
+    71:"Arts, Entertainment, and Recreation",
+    72:"Accommodation and Food Services",
+    81:"Other Services (except Public Administration)",
+    92:"Public Administration",
+    0:"Not Classified"
+}
 
 class EventListenerManager {
     
@@ -393,6 +420,9 @@ class BusinessMarkers extends MarkersManager{
     
                 // Add click listener to each marker
                 marker.addListener("click", () => {
+                    const numberPart = row.NaicsCode ? row.NaicsCode : '';
+                    const category = row.NaicsCode ? NAICS_Categories[row.NaicsCode.substring(0, 2)] : 'N/A';
+                    
                     const contentString = `
                         <div>
                             <h3>${row.LocAcctName}</h3>
@@ -400,9 +430,11 @@ class BusinessMarkers extends MarkersManager{
                                 <li>Address: ${row.Address}</li>
                                 <li>Ward: ${wards[row.Representative]}</li>
                                 ${row.NaicsCode ? `<li>Business Type: ${descriptionPart}</li><li>NAICS Code: ${numberPart}</li>` : ''}
+                                <li>Category: ${category}</li>
                             </ul>
                         </div>
                     `;
+                
                     infoWindow.close();
                     infoWindow.setContent(contentString);
                     infoWindow.open(marker.getMap(), marker);
