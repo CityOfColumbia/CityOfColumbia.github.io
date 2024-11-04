@@ -1,0 +1,24 @@
+name: Inject API Key
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  inject-api-key:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Replace API key in HTML
+      run: |
+        sed -i 's/{API_KEY}/${{ secrets.API_KEY }}/g' index.html
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
