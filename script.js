@@ -1,6 +1,7 @@
 //TODO: I think revamping how the map is passed to the managers. We could just have the mapManager pass this.map to them instead of needing to call the functions with mapManager.map
 
 let mapManager
+let htmlManager
 let wards = {
     'Lisa Meyer':'Ward 2', 
     'Nick Foster':'Ward 4', 
@@ -8,7 +9,108 @@ let wards = {
     'Roy Lovelady':'Ward 3', 
     'Donald Waterman':'Ward 5',
     'Betsy Peters':'Ward 6'
-    };
+};
+
+
+
+
+function showFeatures(featureType) { //TODO: Clean up this function
+    const featureTables = document.querySelectorAll('.parent-feature-table');
+
+    featureTables.forEach(table => {
+        table.style.display = 'none';
+        // Reset form elements
+        const inputs = table.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'radio' ) {
+                input.checked = false;
+            } else if (input.type === 'checkbox') {
+
+                input.checked = true
+
+
+            }
+        });
+
+        const selects = table.querySelectorAll('select');
+        selects.forEach(select => {
+            select.selectedIndex = 0;
+        });
+    });
+
+    const featureTables2 = document.querySelectorAll('.feature-table');
+
+    featureTables2.forEach(table => {
+        table.style.display = 'none';
+        // Reset form elements
+        const inputs = table.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        const selects = table.querySelectorAll('select');
+        selects.forEach(select => {
+            select.selectedIndex = 0;
+        });
+
+        // Check all options except "All" for non-radio tables
+        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.id !== 'all') {
+                checkbox.checked = true;
+            }
+        });
+    });
+
+    mapManager.cleanup();
+
+    if (featureType === 'Business') {
+        mapManager.createMap('WardOutlines.geojson','data.csv','ADDRESSES_WITH_WARD_LAT_LONG.csv','Business');
+        mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
+        document.getElementById('business-controls').style.display = 'block';
+    }
+    
+    if (featureType === 'Demographic') {
+        if(!mapManager.poly)
+            mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
+        document.getElementById('demographic-controls').style.display = 'block';
+        mapManager.addZoomOutListeners();
+    }
+}
+
+class HTMLManager {
+  
+    constructor() { 
+        this.constructed = true;
+        this.currentTableId = null;
+    }
+
+    showTable(tableId) {
+        // Hide all tables and set inputs to false if they were previously selected
+        document.querySelectorAll('.feature-table').forEach(table => {
+            if (table.style.display !== 'none') {
+                this.setInputsFalse(table.querySelectorAll('input'));
+            }
+            table.style.display = 'none';
+        });
+        // Show the selected table
+        document.getElementById(tableId).style.display = 'block';
+        this.currentTableId = tableId;
+    }
+
+    setInputsFalse(inputs){
+        inputs.forEach(input => {
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                input.checked = false;
+            }
+        });
+    }
+
+}
 
 
 class EventListenerManager {
@@ -746,89 +848,10 @@ for (let i = 1; i <= 6; i++){
 
 }
 
-function showFeatures(featureType) { //TODO: Clean up this function
-    const featureTables = document.querySelectorAll('.parent-feature-table');
-
-    featureTables.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' ) {
-                input.checked = false;
-            } else if (input.type === 'checkbox') {
-
-                input.checked = true
-
-
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-    });
-
-    const featureTables2 = document.querySelectorAll('.feature-table');
-
-    featureTables2.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Check all options except "All" for non-radio tables
-        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.id !== 'all') {
-                checkbox.checked = true;
-            }
-        });
-    });
-
-    mapManager.cleanup();
-
-    if (featureType === 'Business') {
-        mapManager.createMap('WardOutlines.geojson','data.csv','ADDRESSES_WITH_WARD_LAT_LONG.csv','Business');
-        mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-        document.getElementById('business-controls').style.display = 'block';
-    }
-    
-    if (featureType === 'Demographic') {
-        if(!mapManager.poly)
-            mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-        document.getElementById('demographic-controls').style.display = 'block';
-        mapManager.addZoomOutListeners();
-    }
-}
-
-
-function showTable(tableId) {
-    // Hide all tables
-    document.querySelectorAll('.feature-table').forEach(table => {
-        table.style.display = 'none';
-    });
-    // Show the selected table
-    document.getElementById(tableId).style.display = 'block';
-}
-
-
 // Usage example:
 async function initMap(){
     mapManager = new MapManager();
+    htmlManager = new HTMLManager();
     mapManager.createMap("WardOutlines.geojson","data.csv","ADDRESSES_WITH_WARD_LAT_LONG.csv","Business")
-    console.log("Marker Datalist!:")
-    mapManager.markerManager.showMarkers()
+
 };
