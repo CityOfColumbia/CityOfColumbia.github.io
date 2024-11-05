@@ -822,7 +822,7 @@ class DemographicPolygons extends PolygonManager {
                 content += `
                         <tr>
                             <td>${selectedSubCategory.id}</td>
-                            <td>${demo}</td>
+                            <td>${demographicData}</td>
                         </tr>`;
             
     
