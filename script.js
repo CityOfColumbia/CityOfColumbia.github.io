@@ -693,56 +693,155 @@ class DemographicPolygons extends PolygonManager {
         this.loadWardData().then(({ dataList, minMaxValues }) => {
             this.wardData = dataList;
             this.minMaxValues = minMaxValues;
-
+            this.addInfoBoxes()
         });
     }
 
     async loadWardData() {
-        const dataList = [];
+        const dataList = {};
         const minMaxValues = {};
-
+    
         try {
             const response = await fetch(this.csvData);
             const csvText = await response.text();
             const rows = csvText.split('\n');
             const headers = rows[0].split(',');
-
+    
             // Initialize minMaxValues with Infinity and -Infinity
             headers.forEach(header => {
                 minMaxValues[header.trim()] = [Infinity, -Infinity];
             });
-
+    
             rows.slice(1).forEach(row => {
                 const values = row.split(',');
+                const ward = "Ward " + values[headers.indexOf('Ward')].replace('\r', ''); // Get the Ward value
                 const rowDict = {};
-
                 headers.forEach((header, index) => {
-                    let value = values[index].replace('\r', ''); // Remove \r from the value
-                    rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
-
-                    // Update min and max values
-                    const numValue = parseFloat(value);
-                    if (!isNaN(numValue)) {
-                        if (numValue < minMaxValues[header.trim()][0]) {
-                            minMaxValues[header.trim()][0] = numValue;
-                        }
-                        if (numValue > minMaxValues[header.trim()][1]) {
-                            minMaxValues[header.trim()][1] = numValue;
+                    if (header.trim() !== 'Ward') {
+                        let value = values[index].replace('\r', ''); // Remove \r from the value
+                        rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
+    
+                        // Update min and max values
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                            if (numValue < minMaxValues[header.trim()][0]) {
+                                minMaxValues[header.trim()][0] = numValue;
+                            }
+                            if (numValue > minMaxValues[header.trim()][1]) {
+                                minMaxValues[header.trim()][1] = numValue;
+                            }
                         }
                     }
                 });
-
-                dataList.push(rowDict);
+    
+                if (!dataList[ward]) {
+                    dataList[ward] = [];
+                }
+                dataList[ward] = rowDict;
             });
-
+    
             return { dataList, minMaxValues };
         } catch (error) {
             console.error('Error loading CSV data:', error);
             return { dataList: [], minMaxValues: {} };
         }
     }
-
     
+    getWardData(){
+        return this.wardData
+    }
+
+    addInfoBoxes() {
+        const infoBox = this.mapManager.map.data.addListener('click', (event) => {
+            // Check if data is loaded
+            const featureName = event.feature.getProperty('Name');
+    
+            // Check if the feature's name is in the targetNames array
+            if (!(featureName in wards)) {
+                return; // Exit the function if the feature's name is not in the list
+            }
+    
+            if (this.infowindow) {
+                this.infowindow.close();
+            }
+    
+            // Get the selected demographic category
+            const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
+            if (!selectedDemographic) {
+                console.log('No demographic selected');
+                return
+            }
+            console.log(`Selected demographic: ${selectedDemographic.id}`);
+
+            const subCategoryName = selectedDemographic.id;
+            const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
+            if (selectedSubCategory) {
+                console.log(`Selected sub-category: ${selectedSubCategory.id}`);
+            } else {
+                console.log('No sub-category selected');
+            }
+
+            if(typeof selectedSubCategory.id === 'string'){
+                console.log("scoobigig googgig")
+            }
+        
+            const featureInfo = this.wardData[wards[featureName]] || {};
+            console.log("FeatureINFO!",featureInfo)
+            console.log("featureINFO['Black']", featureInfo['Black'])
+            console.log('featureINFO["Black"]', featureInfo["Black"])
+            const demographicData = featureInfo[selectedSubCategory.id] || {};
+            console.log("demographicData!", demographicData)
+            const geometry = event.feature.getGeometry();
+            const bounds = new google.maps.LatLngBounds();
+            geometry.forEachLatLng((latlng) => {
+                bounds.extend(latlng);
+            });
+    
+            const center = bounds.getCenter();
+    
+            let content = `
+                <title>Feature Info Table</title>
+                <style>
+                    #infoTable {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    #infoTable th, #infoTable td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
+                    #infoTable th {
+                        background-color: #f2f2f2;
+                        text-align: left;
+                    }
+                </style>
+                <table id="infoTable">
+                <caption style="font-weight: bold">${wards[featureName]}</caption>
+                    <tbody>`;
+    
+           
+                content += `
+                        <tr>
+                            <td>${selectedSubCategory.id}</td>
+                            <td>${demographicData}</td>
+                        </tr>`;
+            
+    
+            content += `
+                    </tbody>
+                </table>`;
+    
+            this.infowindow = new google.maps.InfoWindow({
+                content: content,
+                position: center,
+                disableAutoPan: true
+            });
+            this.infowindow.open(this.mapManager.map);
+        });
+        this.mapManager.eventListeners.addListener(infoBox);
+    }
+    
+
     getColor(value, min, max) {
         // Normalize the value to a range between 0 and 1
         const normalized = (value - min) / (max - min);
@@ -760,9 +859,9 @@ class DemographicPolygons extends PolygonManager {
         return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
     
+}
     
-    
-} 
+
 
 //uses self.polygons, which will have multiple dictionaries of {Ward X: Feature}, potentially multiple Ward X
 function setDemographicMapStyle(option){
@@ -771,9 +870,8 @@ let demographics = mapManager.polygonManager.wardData;
 
 let rgbValues = []
 for(let i = 0; i<= 5; i++){
-    console.log("Ward ", i)
-    console.log("Demographics!", demographics)
-    rgbValues.push(mapManager.polygonManager.getColor(demographics[i][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
+
+    rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
 }
 for (let i = 1; i <= 6; i++){
     let wardString = "Ward " + i;
