@@ -21,9 +21,10 @@ jobs:
         git remote -v
         git branch -a
 
-    - name: Replace API key in HTML
-      run: |
-        sed 's/{API_KEY}/${{ secrets.API_KEY }}/g' index.html > index.html
+        - name: Replace API key in HTML
+        run: |
+          sed 's/{API_KEY}/'${{ secrets.API_KEY }}'/g' index.html > temp.html && mv temp.html index.html
+      
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
