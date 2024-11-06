@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Map</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdGH3RZS7P_Nd389Yrl5DswJtrM5F0ZI&loading=async&libraries=visualization&callback=initMap" async defer></script>
 
+    <script src="script.js" defer></script>
     <style>
         html, body {
             height: 100%;
@@ -29,6 +30,7 @@
             height: 100%;
             width: 100%;
         }
+
 
         #business-controls {
             position: absolute;
@@ -132,12 +134,12 @@
                 <td><input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White</td>
             </tr>
             <tr id="age-controls" class="feature-table" style="display: none;">
-                <td><input type="radio" id="child" name="age" onclick="setDemographicMapStyle('Child')"> Child</td>
-                <td><input type="radio" id="adult" name="age" onclick="setDemographicMapStyle('Adult')"> Adult</td>
+                <td><input type="radio" id="Child" name="age" onclick="setDemographicMapStyle('Child')"> Child</td>
+                <td><input type="radio" id="Adult" name="age" onclick="setDemographicMapStyle('Adult')"> Adult</td>
             </tr>
             <tr id="sex-controls" class="feature-table" style="display: none;">
-                <td><input type="radio" id="male" name="sex" onclick="setDemographicMapStyle('Male')"> Male</td>
-                <td><input type="radio" id="female" name="sex" onclick="setDemographicMapStyle('Female')"> Female</td>
+                <td><input type="radio" id="Male" name="sex" onclick="setDemographicMapStyle('Male')"> Male</td>
+                <td><input type="radio" id="Female" name="sex" onclick="setDemographicMapStyle('Female')"> Female</td>
             </tr>
         </table>
     </div>
