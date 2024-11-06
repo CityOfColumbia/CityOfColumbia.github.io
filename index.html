@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="script.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXFye0a95qdi9jgrsp6UDVAlR6UaMV2r0&loading=async&libraries=visualization&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdGH3RZS7P_Nd389Yrl5DswJtrM5F0ZI&loading=async&libraries=visualization&callback=initMap" async defer></script>
 
     <style>
         html, body {
@@ -114,8 +114,8 @@
     </div>
 
     <div id="feature-toggle">
-        <label><input type="radio" name="feature" value="Demographic" onclick="showFeatures('Demographic')"> Demographics</label><br>
-        <label><input type="radio" name="feature" value="Business" onclick="showFeatures('Business')" checked> Business</label>
+        <label><input type="radio" name="feature" value="Demographic" onclick="htmlManager.showFeatures('Demographic')"> Demographics</label><br>
+        <label><input type="radio" name="feature" value="Business" onclick="htmlManager.showFeatures('Business')" checked> Business</label>
     </div>
 
     <div id="demographic-controls" class="parent-feature-table" style="display: none; position: absolute; top: 0; left: 0;">
