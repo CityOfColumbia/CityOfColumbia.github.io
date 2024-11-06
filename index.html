@@ -116,17 +116,17 @@
     </div>
 
     <div id="feature-toggle">
-        <label><input type="radio" name="feature" value="Demographic" onclick="showFeatures('Demographic')"> Demographics</label><br>
-        <label><input type="radio" name="feature" value="Business" onclick="showFeatures('Business')" checked> Business</label>
+        <label><input type="radio" name="feature" value="Demographic" onclick="htmlManager.showFeatures('Demographic')"> Demographics</label><br>
+        <label><input type="radio" name="feature" value="Business" onclick="htmlManager.showFeatures('Business')" checked> Business</label>
     </div>
 
     <div id="demographic-controls" class="parent-feature-table" style="display: none; position: absolute; top: 0; left: 0;">
         <table>
             <tr>
                 <td colspan="2">
-                    <input type="radio" id="race" name="demographic" onclick="showTable('race-controls')"> Race
-                    <input type="radio" id="age" name="demographic" onclick="showTable('age-controls')"> Age
-                    <input type="radio" id="sex" name="demographic" onclick="showTable('sex-controls')"> Sex
+                    <input type="radio" id="race" name="demographic" onclick="htmlManager.showTable('race-controls')"> Race
+                    <input type="radio" id="age" name="demographic" onclick="htmlManager.showTable('age-controls')"> Age
+                    <input type="radio" id="sex" name="demographic" onclick="htmlManager.showTable('sex-controls')"> Sex
                 </td>
             </tr>
             <tr id="race-controls" class="feature-table" style="display: none;">
