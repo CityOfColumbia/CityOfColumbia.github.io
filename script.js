@@ -11,7 +11,7 @@ let wards = {
     'Betsy Peters':'Ward 6'
 
 
-
+}
 
 
 function showFeatures(featureType) { //TODO: Clean up this function
