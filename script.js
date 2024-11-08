@@ -146,7 +146,7 @@ class HTMLManager {
 
 
         if (featureType === 'Business') {
-            this.mapManager.createMap('WardOutlines.geojson','data.csv','ADDRESSES_WITH_WARD_LAT_LONG.csv','Business');
+            this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('business-controls').style.display = 'block';
         }
@@ -574,7 +574,7 @@ class BusinessMarkers extends MarkersManager{
             const lat = parseFloat(row.Latitude);
             const long = parseFloat(row.Longitude);
 
-            let numberPart, descriptionPart;
+            let numberPart;
             
     
             if (!isNaN(lat) && !isNaN(long)) {
@@ -582,14 +582,14 @@ class BusinessMarkers extends MarkersManager{
                     position: { lat: lat, lng: long },
                     map: this.mapManager.map,
                     icon: markerIcon,
-                    title: row.LocAcctName
+                    title: typeof row.LocAcctName === 'string' ? row.LocAcctName : String(row.LocAcctName)
                 });
 
                 values.push(marker,row.LocAcctName, wards[row.Representative])
 
                  if (row.NaicsCode) {
-                    [numberPart, descriptionPart] = row.NaicsCode.split(' - ');
-                    values.push(numberPart, descriptionPart, true, lat, long)
+                    numberPart= row.NaicsCode
+                    values.push(numberPart, null, true, lat, long)
                 } else {
                     values.push(null,null, true, lat, long)
 
@@ -600,8 +600,9 @@ class BusinessMarkers extends MarkersManager{
                 // Add click listener to each marker
                 marker.addListener("click", () => {
                     const numberPart = row.NaicsCode ? row.NaicsCode : '';
-                    const category = row.NaicsCode ? NAICS_Categories[row.NaicsCode.substring(0, 2)] : 'N/A';
-                    
+                    const category = row.NaicsCode ? NAICS_Categories[String(row.NaicsCode).substring(0, 2)] : 'N/A';
+                    const descriptionPart = row.descriptionPart ? row.descriptionPart : '';
+                
                     const contentString = `
                         <div>
                             <h3>${row.LocAcctName}</h3>
@@ -1064,6 +1065,6 @@ for (let i = 1; i <= 6; i++){
 async function initMap(){
     mapManager = new MapManager();
     htmlManager = new HTMLManager(mapManager);
-    mapManager.createMap("WardOutlines.geojson","data.csv","ADDRESSES_WITH_WARD_LAT_LONG.csv","Business")
+    mapManager.createMap("WardOutlines.geojson","data.csv","addresses_with_wards_NEW.csv","Business")
 
 };
