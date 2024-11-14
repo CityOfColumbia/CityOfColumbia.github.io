@@ -873,6 +873,8 @@ class DemographicPolygons extends PolygonManager {
             this.wardData = dataList;
             this.minMaxValues = minMaxValues;
             this.addInfoBoxes()
+            console.log("in demoPolygons, minMaxValues", this.minMaxValues)
+
         });
     }
 
@@ -900,14 +902,16 @@ class DemographicPolygons extends PolygonManager {
                         let value = values[index]; // Remove \r from the value
                         rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
     
-                        // Update min and max values
-                        const numValue = parseFloat(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < minMaxValues[header.trim()][0]) {
-                                minMaxValues[header.trim()][0] = numValue;
-                            }
-                            if (numValue > minMaxValues[header.trim()][1]) {
-                                minMaxValues[header.trim()][1] = numValue;
+                        // Update min and max values only if the ward is not "All"
+                        if (ward !== "Ward All") {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < minMaxValues[header.trim()][0]) {
+                                    minMaxValues[header.trim()][0] = numValue;
+                                }
+                                if (numValue > minMaxValues[header.trim()][1]) {
+                                    minMaxValues[header.trim()][1] = numValue;
+                                }
                             }
                         }
                     }
@@ -947,29 +951,29 @@ class DemographicPolygons extends PolygonManager {
             // Get the selected demographic category
             const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
             if (!selectedDemographic) {
-                console.log('No demographic selected');
+                // console.log('No demographic selected');
                 return
             }
-            console.log(`Selected demographic: ${selectedDemographic.id}`);
+            // console.log(`Selected demographic: ${selectedDemographic.id}`);
 
             const subCategoryName = selectedDemographic.id;
             const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
             if (selectedSubCategory) {
-                console.log(`Selected sub-category: ${selectedSubCategory.id}`);
+                // console.log(`Selected sub-category: ${selectedSubCategory.id}`);
             } else {
-                console.log('No sub-category selected');
+                // console.log('No sub-category selected');
             }
 
             if(typeof selectedSubCategory.id === 'string'){
-                console.log("scoobigig googgig")
+                // console.log("scoobigig googgig")
             }
         
             const featureInfo = this.wardData[wards[featureName]] || {};
-            console.log("FeatureINFO!",featureInfo)
-            console.log("featureINFO['Black']", featureInfo['Black'])
-            console.log('featureINFO["Black"]', featureInfo["Black"])
+            // console.log("FeatureINFO!",featureInfo)
+            // console.log("featureINFO['Black']", featureInfo['Black'])
+            // console.log('featureINFO["Black"]', featureInfo["Black"])
             const demographicData = featureInfo[selectedSubCategory.id] || {};
-            console.log("demographicData!", demographicData)
+            // console.log("demographicData!", demographicData)
             const geometry = event.feature.getGeometry();
             const bounds = new google.maps.LatLngBounds();
             geometry.forEachLatLng((latlng) => {
@@ -1032,9 +1036,8 @@ class DemographicPolygons extends PolygonManager {
         
         // Ensure b is never lower than 155
         b = Math.max(b, 65);
-        
         // Ensure alpha is between 0.3 and 0.8
-        const a = 0.4 + (0.5 * normalized); // Alpha increases from 0.3 to 0.8
+        const a = .1 + (1.0 * normalized); // Alpha increases from 0.3 to 0.8
         return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
     
@@ -1052,6 +1055,9 @@ for(let i = 0; i<= 5; i++){
 
     rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
 }
+
+console.log("This is the rgb values!:", rgbValues)
+
 for (let i = 1; i <= 6; i++){
     let wardString = "Ward " + i;
     for(let feature of mapManager.polygonManager.polygons[wardString]){
