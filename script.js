@@ -893,11 +893,11 @@ class DemographicPolygons extends PolygonManager {
     
             rows.slice(1).forEach(row => {
                 const values = row.split(',');
-                const ward = "Ward " + values[headers.indexOf('Ward')].replace('\r', ''); // Get the Ward value
+                const ward = "Ward " + values[headers.indexOf('Ward')]; // Get the Ward value
                 const rowDict = {};
                 headers.forEach((header, index) => {
                     if (header.trim() !== 'Ward') {
-                        let value = values[index].replace('\r', ''); // Remove \r from the value
+                        let value = values[index]; // Remove \r from the value
                         rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
     
                         // Update min and max values
@@ -918,7 +918,7 @@ class DemographicPolygons extends PolygonManager {
                 }
                 dataList[ward] = rowDict;
             });
-    
+            console.log("Datalist!", dataList)
             return { dataList, minMaxValues };
         } catch (error) {
             console.error('Error loading CSV data:', error);
