@@ -1029,17 +1029,17 @@ class DemographicPolygons extends PolygonManager {
         // Normalize the value to a range between 0 and 1
         const normalized = (value - min) / (max - min);
         
-        // Calculate the blue gradient components
-        const r = 0; // Red remains 0
-        const g = 0; // Green decreases as value increases
-        let b = Math.floor(255 * normalized); // Blue increases as value increases
+        // Calculate the gradient components
+        const r = 255; // Red remains 255
+        const g = Math.floor(255 * (1 - normalized)); // Green decreases as value increases
+        const b = 0; // Blue remains 0
         
-        // Ensure b is never lower than 155
-        b = Math.max(b, 65);
         // Ensure alpha is between 0.3 and 0.8
-        const a = .1 + (1.0 * normalized); // Alpha increases from 0.3 to 0.8
+        const a = .8; // Adjusted to fit your range
+        
         return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
+    
     
 }
     
