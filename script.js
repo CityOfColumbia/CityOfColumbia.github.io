@@ -1056,8 +1056,6 @@ for(let i = 0; i<= 5; i++){
     rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
 }
 
-console.log("This is the rgb values!:", rgbValues)
-
 for (let i = 1; i <= 6; i++){
     let wardString = "Ward " + i;
     for(let feature of mapManager.polygonManager.polygons[wardString]){
