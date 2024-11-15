@@ -13,6 +13,20 @@ let wards = {
 
 }
 
+let RGBAValues = {
+    'Race':['rgba(30,79,91,.8)','rgba(50,130,150,.8)','rgba(89,173,200,.8)','rgba(116,183,209,.8)','rgba(153,211,221,.8)','rgba(194,229,235,.8)'],
+    'Age':['rgba(34,68,23,.8)','rgba(51,101,34,.8)','rgba(68,142,47,.8)','rgba(95,181,60,.8)','rgba(124,200,90,.8)','rgba(157,213,128,.8)'],
+    'Sex':['rgba(76,31,25,.8)','rgba(110,44,37,.8)','rgba(158,60,53,.8)','rgba(194,77,72,.8)','rgba(212,128,126,.8)','rgba(226,176,167,.8)']
+}
+
+let DemographicHierarchy = {
+    'Black':'Race',
+    'White':'Race',
+    'Child':'Age',
+    'Adult':'Age',
+    'Male':'Sex',
+    'Female':'Sex'
+}
 
 function showFeatures(featureType) { //TODO: Clean up this function
     const featureTables = document.querySelectorAll('.parent-feature-table');
@@ -869,11 +883,13 @@ class DemographicPolygons extends PolygonManager {
     constructor(map, geoJsonUrl, polygonData, managerID) {
         super(map, geoJsonUrl, managerID);
         this.csvData = polygonData;
-        this.loadWardData().then(({ dataList, minMaxValues }) => {
+        this.loadWardData().then(({ dataList,wardRankings, minMaxValues }) => {
             this.wardData = dataList;
+            this.wardRankings = wardRankings
             this.minMaxValues = minMaxValues;
             this.addInfoBoxes()
             console.log("in demoPolygons, minMaxValues", this.minMaxValues)
+            console.log("in demopolygons, wardrankings", this.wardRankings)
 
         });
     }
@@ -881,6 +897,7 @@ class DemographicPolygons extends PolygonManager {
     async loadWardData() {
         const dataList = {};
         const minMaxValues = {};
+        const wardRankings = {};
     
         try {
             const response = await fetch(this.csvData);
@@ -895,15 +912,16 @@ class DemographicPolygons extends PolygonManager {
     
             rows.slice(1).forEach(row => {
                 const values = row.split(',');
-                const ward = "Ward " + values[headers.indexOf('Ward')]; // Get the Ward value
-                const rowDict = {};
-                headers.forEach((header, index) => {
-                    if (header.trim() !== 'Ward') {
-                        let value = values[index]; // Remove \r from the value
-                        rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
+                const ward = "Ward " + values[headers.indexOf('Ward')].trim(); // Get the Ward value and trim any extra spaces
     
-                        // Update min and max values only if the ward is not "All"
-                        if (ward !== "Ward All") {
+                if (ward !== "Ward All") { // Skip "Ward All"
+                    const rowDict = {};
+                    headers.forEach((header, index) => {
+                        if (header.trim() !== 'Ward') {
+                            let value = values[index]; // Remove \r from the value
+                            rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
+    
+                            // Update min and max values
                             const numValue = parseFloat(value);
                             if (!isNaN(numValue)) {
                                 if (numValue < minMaxValues[header.trim()][0]) {
@@ -914,19 +932,38 @@ class DemographicPolygons extends PolygonManager {
                                 }
                             }
                         }
-                    }
-                });
+                    });
     
-                if (!dataList[ward]) {
-                    dataList[ward] = [];
+                    if (!dataList[ward]) {
+                        dataList[ward] = {};
+                    }
+                    dataList[ward] = rowDict;
                 }
-                dataList[ward] = rowDict;
             });
-            console.log("Datalist!", dataList)
-            return { dataList, minMaxValues };
+    
+            // Calculate ranks for each demographic
+            headers.forEach(header => {
+                if (header.trim() !== 'Ward') {
+                    const demographicValues = [];
+                    for (const ward in dataList) {
+                        demographicValues.push({ ward, value: dataList[ward][header.trim()] });
+                    }
+                    demographicValues.sort((a, b) => b.value - a.value); // Sort in descending order
+    
+                    demographicValues.forEach((item, index) => {
+                        if (!wardRankings[item.ward]) {
+                            wardRankings[item.ward] = {};
+                        }
+                        wardRankings[item.ward][header.trim()] = index + 1; // Rank starts from 1
+                    });
+                }
+            });
+    
+            console.log("Ward Rankings:", wardRankings);
+            return { dataList, wardRankings, minMaxValues };
         } catch (error) {
             console.error('Error loading CSV data:', error);
-            return { dataList: [], minMaxValues: {} };
+            return { dataList: {}, wardRankings: {}, minMaxValues: {} };
         }
     }
     
@@ -1025,22 +1062,26 @@ class DemographicPolygons extends PolygonManager {
     }
     
 
-    getColor(value, min, max) {
-        // Normalize the value to a range between 0 and 1
-        const normalized = (value - min) / (max - min);
+    //this getColor function is depricated
+//     getColor(value, min, max) { 
+//         // Normalize the value to a range between 0 and 1
+//         const normalized = (value - min) / (max - min);
         
-        // Calculate the gradient components
-        const r = 255; // Red remains 255
-        const g = Math.floor(255 * (1 - normalized)); // Green decreases as value increases
-        const b = 0; // Blue remains 0
+//         // Calculate the gradient components
+//         const r = 255; // Red remains 255
+//         const g = Math.floor(255 * (1 - normalized)); // Green decreases as value increases
+//         const b = 0; // Blue remains 0
         
-        // Ensure alpha is between 0.3 and 0.8
-        const a = .8; // Adjusted to fit your range
+//         // Ensure alpha is between 0.3 and 0.8
+//         const a = .8; // Adjusted to fit your range
         
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
+//         return `rgba(${r}, ${g}, ${b}, ${a})`;
+//     }
+    
+    getColor(rank,option){
+        console.log("in get color: option, Demohierachy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank-1 " , option, DemographicHierarchy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank -1)
+        return RGBAValues[DemographicHierarchy[option]][rank - 1]
     }
-    
-    
 }
     
 
@@ -1052,9 +1093,10 @@ let demographics = mapManager.polygonManager.wardData;
 
 let rgbValues = []
 for(let i = 0; i<= 5; i++){
-
-    rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
+    rgbValues.push(mapManager.polygonManager.getColor(mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
+    // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
 }
+console.log("in setDemographicMapStyle, rgba", rgbValues)
 
 for (let i = 1; i <= 6; i++){
     let wardString = "Ward " + i;
