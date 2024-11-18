@@ -707,7 +707,7 @@ class PolygonManager {
     }
 
     async loadBoonecounty(){
-        this.mapManager.map.data.loadGeoJson('Boone-county_MO.geojson')
+        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson')
     }
 
     async loadGeoJson() {
