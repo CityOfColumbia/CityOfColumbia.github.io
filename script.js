@@ -28,73 +28,6 @@ let DemographicHierarchy = {
     'Female':'Sex'
 }
 
-function showFeatures(featureType) { //TODO: Clean up this function
-    const featureTables = document.querySelectorAll('.parent-feature-table');
-
-    featureTables.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' ) {
-                input.checked = false;
-            } else if (input.type === 'checkbox') {
-
-                input.checked = true
-
-
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-    });
-
-    const featureTables2 = document.querySelectorAll('.feature-table');
-
-    featureTables2.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Check all options except "All" for non-radio tables
-        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.id !== 'all') {
-                checkbox.checked = true;
-            }
-        });
-    });
-
-    mapManager.cleanup();
-
-    if (featureType === 'Business') {
-        mapManager.createMap('WardOutlines.geojson','data.csv','ADDRESSES_WITH_WARD_LAT_LONG.csv','Business');
-        mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-        document.getElementById('business-controls').style.display = 'block';
-    }
-    
-    if (featureType === 'Demographic') {
-        if(!mapManager.poly)
-            mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-        document.getElementById('demographic-controls').style.display = 'block';
-        mapManager.addZoomOutListeners();
-    }
-}
 
 class HTMLManager {
   
@@ -104,21 +37,18 @@ class HTMLManager {
         this.mapManager = mapManager
     }
 
-    showFeatures(featureType){
+    showFeatures(featureType) {
         const featureTables = document.querySelectorAll('.parent-feature-table');
-
+    
         featureTables.forEach(table => {
             table.style.display = 'none';
             // Reset form elements
             const inputs = table.querySelectorAll('input');
             inputs.forEach(input => {
-                if (input.type === 'radio' ) {
+                if (input.type === 'radio') {
                     input.checked = false;
                 } else if (input.type === 'checkbox') {
-    
-                    input.checked = true
-    
-    
+                    input.checked = true;
                 }
             });
     
@@ -155,22 +85,28 @@ class HTMLManager {
                 }
             });
         });
-
-        this.mapManager.cleanup()
-
-
+    
+        this.mapManager.cleanup();
+    
         if (featureType === 'Business') {
-            this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
+            this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('business-controls').style.display = 'block';
         }
-        
+    
         if (featureType === 'Demographic') {
-            if(!this.mapManager.polygonManager)
+            if (!this.mapManager.polygonManager)
                 this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
             document.getElementById('demographic-controls').style.display = 'block';
             this.mapManager.addZoomOutListeners();
-        }    }
+    
+            // Show the demographic legend and set the image source to a blank image
+            const demographicLegend = document.getElementById('demographic-legend');
+            demographicLegend.style.display = 'block';
+            const gradientImage = document.getElementById('gradient-image');
+            gradientImage.src = 'blank-image.png'; // Replace with the actual URL of your blank image
+        }
+    }
 
     showTable(tableId) {
         // Hide all tables and set inputs to false if they were previously selected
@@ -199,6 +135,11 @@ class HTMLManager {
                 input.checked = true;
             }
         });
+    }
+
+    changeImage(element, newImage){
+        var image = document.getElementById(element)
+        image.src = newImage
     }
 }
 

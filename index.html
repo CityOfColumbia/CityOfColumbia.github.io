@@ -95,6 +95,33 @@
             cursor: pointer;
 }
 
+        .legend {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ffffff;
+        }
+        .gradient {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .gradient img {
+            width: 100%;
+            height: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -144,5 +171,14 @@
         </table>
     </div>
     
+    <div id="demographic-legend" class="legend" style="display:none" >         
+    <div>X</div>
+    <div class="gradient">
+        <span>Highest</span>
+        <img id="gradient-image"  alt="Gradient">
+        <span>Lowest</span>
+    </div>
+</div>
+
 </body>
 </html>
