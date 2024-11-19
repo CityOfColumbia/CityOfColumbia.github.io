@@ -623,7 +623,7 @@ class BusinessMarkers extends MarkersManager{
                             <ul>
                                 <li>Address: ${row.Address}</li>
                                 <li>Ward: ${wards[row.Representative]}</li>
-                                ${row.NaicsCode ? `<li>Business Type: ${descriptionPart}</li><li>NAICS Code: ${numberPart}</li>` : ''}
+                                ${row.NaicsCode ? `<li>NAICS Code: ${numberPart}</li>` : ''}
                                 <li>Category: ${category}</li>
                             </ul>
                         </div>
