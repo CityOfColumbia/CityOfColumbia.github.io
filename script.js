@@ -694,24 +694,33 @@ class BusinessMarkers extends MarkersManager{
 
 
 class PolygonManager {
-    constructor(mapManager, geoJsonUrl, managerID) {
+    constructor(mapManager, wardGeoJsonUrl, managerID) {
         this.mapManager = mapManager
-        this.geoJsonUrl = geoJsonUrl;
+        this.wardGeoJsonUrl = wardGeoJsonUrl;
         this.infowindow = null;
         this.featureData = {};
         this.polygonsVisible = true;
         this.managerID = managerID;
         this.polygons = {};
-        this.loadBoonecounty();
-        this.loadGeoJson();
+        this.loadBooneCounty()
+        this.loadWardGeoJson();
     }
 
-    async loadBoonecounty(){
-        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson')
+    async loadBooneCounty() {
+        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
+            features.forEach((feature) => {
+                feature.setProperty('visible', true);
+                let countyName = 'Boone County';
+                if (!this.polygons[countyName]) {
+                    this.polygons[countyName] = [];
+                }
+                this.polygons[countyName].push(feature);
+            });
+        });
     }
 
-    async loadGeoJson() {
-        this.mapManager.map.data.loadGeoJson(this.geoJsonUrl, null, (features) => {
+    async loadWardGeoJson() {
+        this.mapManager.map.data.loadGeoJson(this.wardGeoJsonUrl, null, (features) => {
             features.forEach((feature) => {
                 feature.setProperty('visible', true);
                 let wardName = wards[feature.getProperty('Name')];
