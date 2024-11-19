@@ -988,29 +988,13 @@ class DemographicPolygons extends PolygonManager {
             // Get the selected demographic category
             const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
             if (!selectedDemographic) {
-                // console.log('No demographic selected');
                 return
             }
-            // console.log(`Selected demographic: ${selectedDemographic.id}`);
 
             const subCategoryName = selectedDemographic.id;
             const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
-            if (selectedSubCategory) {
-                // console.log(`Selected sub-category: ${selectedSubCategory.id}`);
-            } else {
-                // console.log('No sub-category selected');
-            }
-
-            if(typeof selectedSubCategory.id === 'string'){
-                // console.log("scoobigig googgig")
-            }
-        
             const featureInfo = this.wardData[wards[featureName]] || {};
-            // console.log("FeatureINFO!",featureInfo)
-            // console.log("featureINFO['Black']", featureInfo['Black'])
-            // console.log('featureINFO["Black"]', featureInfo["Black"])
             const demographicData = featureInfo[selectedSubCategory.id] || {};
-            // console.log("demographicData!", demographicData)
             const geometry = event.feature.getGeometry();
             const bounds = new google.maps.LatLngBounds();
             geometry.forEachLatLng((latlng) => {
@@ -1039,11 +1023,11 @@ class DemographicPolygons extends PolygonManager {
                 <caption style="font-weight: bold">${wards[featureName]}</caption>
                     <tbody>`;
     
-           
+
                 content += `
                         <tr>
-                            <td>${selectedSubCategory.id}</td>
-                            <td>${demographicData}</td>
+                            <td>${selectedSubCategory.id.toLocaleString()}</td>
+                            <td>${demographicData.toLocaleString()}</td>
                         </tr>`;
             
     
