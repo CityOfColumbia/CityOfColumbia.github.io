@@ -31,85 +31,136 @@
             width: 100%;
         }
 
-
-        #business-controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            z-index: 5;
-            border: 1px solid #ccc;
-        }
-
-        #demographic-controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            z-index: 5;
-            border: 1px solid #ccc;
-        }
-
-        #feature-toggle {
-            position: absolute;
-            bottom: 10px;
-            right: 10px; /* Changed from left to right */
-            background-color: #f9f9f9;
-            padding: 10px;
-            z-index: 5;
-            border: 1px solid #ccc;
-        }
-
-        /* New styles for the parent container */
-        .parent-feature-table {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* New styles for the table */
-        .parent-feature-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        /* New styles for the table cells */
-        .parent-feature-table td {
-            padding: 5px;
-            text-align: left;
-        }
-
-        /* Optional: Add some hover effects for better UX */
-        .parent-feature-table input[type="radio"] {
-            margin-right: 5px;
-        }
-
-        .parent-feature-table input[type="radio"]:hover {
-            cursor: pointer;
+/* General styling for the business-controls and feature-toggle sections */
+#business-controls {
+    position: absolute;
+    top : 10px;
+    left: 10px;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    color: white; /* White text on a dark background */
 }
-    .race-options {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr); /* 3 columns per row */
-        gap: 5px; /* Reduced space between the options */
-        margin: 0; /* Remove any default margin */
-        padding: 0; /* Remove any default padding */
-    }
-    .race-option {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; /* Align radio button and label to the left */
-        margin: 0; /* Remove margin around each option */
-    }
-    .race-option input {
-        margin-right: 5px; /* Minimal space between radio button and label */
-    }
+
+#feature-toggle {
+    position: absolute;
+    bottom : 10px;
+    left: 10px;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    color: white; /* White text on a dark background */
+}
+/* Apply a dark transparent background and padding */
+#business-controls, #feature-toggle {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Modern radio button and checkbox styling */
+input[type="radio"], input[type="checkbox"] {
+    appearance: none; /* Remove default styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; /* Round shape for radio buttons */
+    border: 2px solid rgba(255, 255, 255, 0.8); /* Light border color */
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    background-color: #333; /* Dark background for the button */
+}
+
+/* When hovered or clicked, change the color */
+input[type="radio"]:checked, input[type="checkbox"]:checked {
+    background-color: #ff6600; /* Orange color matching the heatmap */
+    border-color: #ff6600; /* Border color to match */
+}
+
+/* Create a nice transition when hovering */
+input[type="radio"]:hover, input[type="checkbox"]:hover {
+    background-color: #ff9933;
+    border-color: #ff9933;
+}
+
+/* Label for each radio button and checkbox */
+label {
+    margin-left: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #fff; /* White text for labels */
+    display: inline-block;
+    transition: color 0.3s ease-in-out;
+}
+
+/* Highlight the label when the radio button/checkbox is checked */
+input[type="radio"]:checked + label, input[type="checkbox"]:checked + label {
+    color: #ff6600; /* Matching color to the checked radio button */
+}
+
+/* Styling for the parent table to layout the controls */
+.parent-feature-table {
+    margin: 0;
+    padding: 0;
+}
+
+/* Create a cleaner, spaced layout for control sections */
+#demographic-controls, #race-controls, #age-controls, #sex-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    color: white; /* White text on a dark background */
+}
+
+/* Controls for each demographic option */
+.race-options, .feature-table {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+    margin-top: 5px;
+}
+
+.race-option, td {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Make radio buttons more prominent in demographic options */
+.race-option input[type="radio"], td input[type="radio"] {
+    width: 25px;
+    height: 25px;
+    margin-right: 8px;
+}
+
+/* Enhancing the hover effect on the input options */
+input[type="radio"]:hover, input[type="checkbox"]:hover {
+    background-color: #ff9933;
+    border-color: #ff9933;
+}
+
+/* Styling for the info sections that are shown when a feature is selected */
+.feature-table {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Styling for the 'active' state of the feature toggle buttons */
+input[type="radio"]:checked + label {
+    color: #ff6600;
+}
+
+/* Small font size for the controls */
+label, td {
+    font-size: 14px;
+}
 
 
     </style>

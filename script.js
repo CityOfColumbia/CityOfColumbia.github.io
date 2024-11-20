@@ -401,24 +401,21 @@ class MapManager {
     this.heatmap = new google.maps.visualization.HeatmapLayer({
         data: heatmapData,
         gradient: [
-            'rgba(0, 255, 255, 0)',
-            'rgba(0, 255, 255, 1)',
-            'rgba(0, 191, 255, 1)',
-            'rgba(0, 127, 255, 1)',
-            'rgba(0, 63, 255, 1)',
-            'rgba(0, 0, 255, 1)',
-            'rgba(0, 0, 223, 1)',
-            'rgba(0, 0, 191, 1)',
-            'rgba(0, 0, 159, 1)',
-            'rgba(0, 0, 127, 1)',
-            'rgba(63, 0, 91, 1)',
-            'rgba(127, 0, 63, 1)',
-            'rgba(191, 0, 31, 1)',
-            'rgba(255, 0, 0, 1)'
+            'rgba(255, 255, 255, 0)', // Transparent at the start
+            'rgba(255, 230, 204, 1)', // Light peach
+            'rgba(255, 204, 153, 1)', // Light orange
+            'rgba(255, 178, 102, 1)', // Medium orange
+            'rgba(255, 153, 51, 1)',  // Strong orange
+            'rgba(255, 127, 0, 1)',   // Reddish orange
+            'rgba(255, 102, 0, 1)',   // Reddish orange
+            'rgba(255, 77, 0, 1)',    // Deep orange
+            'rgba(255, 51, 0, 1)',    // Dark orange-red
+            'rgba(255, 0, 0, 1)'      // Bright red at the highest intensity
         ],
         radius: this.getRadius(this.map.getZoom()),
         opacity: 1
     });
+    
 
     this.heatmap.setMap(this.map);
     const heatmapZoomListener = this.map.addListener('zoom_changed', () => {
@@ -582,8 +579,12 @@ class BusinessMarkers extends MarkersManager{
         const csvData = await csvDataPromise;
         const infoWindow = new google.maps.InfoWindow();
         const markerIcon = {
-            url: "https://www.svgrepo.com/download/325321/keyframe.svg",
-            scaledSize: new google.maps.Size(10, 10) // Adjust the size as needed
+            url: "https://www.svgrepo.com/download/186029/pin-maps-and-location.svg",
+            scaledSize: new google.maps.Size(5, 5), // Increase the size for a more prominent marker
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(2.5, 2.5), // Center the marker (half of width/height)
+            rotation: 0,
+           
         };
     
 
@@ -594,7 +595,7 @@ class BusinessMarkers extends MarkersManager{
             const long = parseFloat(row.Longitude);
 
             let numberPart;
-            
+
     
             if (!isNaN(lat) && !isNaN(long)) {
                 const marker = new google.maps.Marker({
