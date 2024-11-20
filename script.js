@@ -325,38 +325,63 @@ class MapManager {
         this.markerManager = new returnMarkerManager(this,latLong)
     }
 
-    createMapDefinitions(){
+    createMapDefinitions() {
         return new google.maps.Map(document.getElementById('map'), {
             zoom: 13,
-            center: {lat: 38.947907, lng: -92.323575},
+            center: { lat: 38.947907, lng: -92.323575 },
             mapTypeId: 'roadmap',
             mapTypeControl: false,
             streetViewControl: false,
             styles: [
-                { elementType: 'geometry', stylers: [{ color: '#212121' }] },
-                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-                { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
-                { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
-                { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+                // General geometry (background) color
+                { elementType: 'geometry', stylers: [{ color: '#000000' }] },  // Dark gray background
+                
+                // Hide most labels to reduce clutter
+                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },  // Hide icons (like POIs)
+                { elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },  // Light gray text for labels
+                { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },  // Dark stroke around labels
+                
+                // Admin and boundary elements
+                { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },  // Lighter gray for administrative boundaries
+                { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },  // Subtle color for country labels
+                
+                // Hide land parcels (reduces clutter)
                 { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+                
+                // Simplify locality labels
                 { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+    
+                // Points of interest (POIs) – light gray text, but hidden if needed
+                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },  // Light gray POI text
+                { featureType: 'poi', elementType: 'geometry', stylers: [{ visibility: 'off' }] },  // Hide POIs
+                
+                // Parks in dark gray (make them blend with the background)
+                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#424242' }] },
                 { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { featureType: 'poi.park', elementType: 'labels.text.stroke', stylers: [{ color: '#1b1b1b' }] },
-                { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
-                { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
-                { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#373737' }] },
-                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3c3c3c' }] },
-                { featureType: 'road.highway.controlled_access', elementType: 'geometry', stylers: [{ color: '#4e4e4e' }] },
+    
+                // Road styling (dark, minimalistic)
+                { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },  // Dark gray fill for roads
+                { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },  // Light road labels
+    
+                // Arterial and highway roads in even darker shades
+                { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#3e3e3e' }] },  
+                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#474747' }] },
+                { featureType: 'road.highway.controlled_access', elementType: 'geometry', stylers: [{ color: '#5a5a5a' }] },
+    
+                // Local roads in slightly lighter gray for visibility
                 { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
-                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+    
+                // Transit labels in light gray
+                { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
+    
+                // Water bodies in dark gray/black to blend seamlessly
+                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },  // Dark gray for water bodies
+                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }  // Water text in dark gray
             ]
         });
     }
+    
+
 
     addZoomOutListeners() {
         // Add a hover listener to change the cursor
@@ -579,14 +604,13 @@ class BusinessMarkers extends MarkersManager{
         const csvData = await csvDataPromise;
         const infoWindow = new google.maps.InfoWindow();
         const markerIcon = {
-            url: "https://www.svgrepo.com/download/186029/pin-maps-and-location.svg",
-            scaledSize: new google.maps.Size(5, 5), // Increase the size for a more prominent marker
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(2.5, 2.5), // Center the marker (half of width/height)
-            rotation: 0,
-           
+            path: google.maps.SymbolPath.CIRCLE,  // Simple circle icon
+            fillColor: "#FFFFFF",  // Light color (white) to contrast with black background
+            fillOpacity: 0.7,  // Slight transparency to blend with the heatmap
+            strokeColor: "#FF5733",  // Border matching heatmap's orangish color
+            strokeWeight: 1,  // Thin border to reduce clutter
+            scale: 2,  // Small size for a subtle presence (adjust for visibility)
         };
-    
 
         csvData.forEach(row => {
             const keys = ["Marker","Name","Ward","Naics","Business Type","isVisible","Lat","Long"]
