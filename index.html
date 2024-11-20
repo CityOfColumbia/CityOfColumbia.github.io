@@ -94,6 +94,23 @@
         .parent-feature-table input[type="radio"]:hover {
             cursor: pointer;
 }
+.race-options {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* 3 columns per row */
+        gap: 5px; /* Reduced space between the options */
+        margin: 0; /* Remove any default margin */
+        padding: 0; /* Remove any default padding */
+    }
+    .race-option {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* Align radio button and label to the left */
+        margin: 0; /* Remove margin around each option */
+    }
+    .race-option input {
+        margin-right: 5px; /* Minimal space between radio button and label */
+    }
+
 
     </style>
 </head>
@@ -130,13 +147,29 @@
                 </td>
             </tr>
             <tr id="race-controls" class="feature-table" style="display: none;">
-                <td><input type="radio" id="Black" name="race" onclick="setDemographicMapStyle('Black')"> Black</td>
-                <td><input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White</td>
-                <td><input type="radio" id="American Indian and Alaska Native" name="race" onclick="setDemographicMapStyle('American Indian and Alaska Native')"> American Indian and Alaska Native</td>
-                <td><input type="radio" id="Asian" name="race" onclick="setDemographicMapStyle('Asian')"> Asian</td>
-                <td><input type="radio" id="Native Hawaiian and Other Pacific Islander" name="race" onclick="setDemographicMapStyle('Native Hawaiian and Other Pacific Islander')"> Native Hawaiian and Other Pacific Islander</td>
-                <td><input type="radio" id="Some Other Race" name="race" onclick="setDemographicMapStyle('Some Other Race')"> Some Other Race</td>
-
+                <td colspan="2">
+                    <!-- Wrap in a div to apply flexbox -->
+                    <div class="race-options">
+                        <div class="race-option">
+                            <input type="radio" id="Black" name="race" onclick="setDemographicMapStyle('Black')"> Black
+                        </div>
+                        <div class="race-option">
+                            <input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White
+                        </div>
+                        <div class="race-option">
+                            <input type="radio" id="American Indian and Alaska Native" name="race" onclick="setDemographicMapStyle('American Indian and Alaska Native')"> American Indian and Alaska Native
+                        </div>
+                        <div class="race-option">
+                            <input type="radio" id="Asian" name="race" onclick="setDemographicMapStyle('Asian')"> Asian
+                        </div>
+                        <div class="race-option">
+                            <input type="radio" id="Native Hawaiian and Other Pacific Islander" name="race" onclick="setDemographicMapStyle('Native Hawaiian and Other Pacific Islander')"> Native Hawaiian and Other Pacific Islander
+                        </div>
+                        <div class="race-option">
+                            <input type="radio" id="Some Other Race" name="race" onclick="setDemographicMapStyle('Some Other Race')"> Some Other Race
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr id="age-controls" class="feature-table" style="display: none;">
                 <td><input type="radio" id="Child" name="age" onclick="setDemographicMapStyle('Child')"> Child</td>
