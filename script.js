@@ -22,6 +22,10 @@ let RGBAValues = {
 let DemographicHierarchy = {
     'Black':'Race',
     'White':'Race',
+    'American Indian and Alaska Native':'Race',
+    'Asian':'Race',
+    'Native Hawaiian and Other Pacific Islander':'Race',
+    'Some Other Race':'Race',
     'Child':'Age',
     'Adult':'Age',
     'Male':'Sex',
@@ -1072,7 +1076,7 @@ class DemographicPolygons extends PolygonManager {
 //     }
     
     getColor(rank,option){
-        console.log("in get color: option, Demohierachy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank-1 " , option, DemographicHierarchy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank -1)
+        // console.log("in get color: option, Demohierachy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank-1 " , option, DemographicHierarchy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank -1)
         return RGBAValues[DemographicHierarchy[option]][rank - 1]
     }
 }
@@ -1086,7 +1090,11 @@ let demographics = mapManager.polygonManager.wardData;
 
 let rgbValues = []
 for(let i = 0; i<= 5; i++){
+    console.log("In set demographicmapstyle TEST")
+    console.log("showing mapManager ward rankings", mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
     rgbValues.push(mapManager.polygonManager.getColor(mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
+    console.log("In set demographicmapstyle TEST")
+
     // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
 }
 console.log("in setDemographicMapStyle, rgba", rgbValues)
