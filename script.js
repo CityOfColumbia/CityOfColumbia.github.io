@@ -159,7 +159,8 @@ class HTMLManager {
                 }
             });
         });
-
+        if(this.mapManager.polygonManager.infowindow != null){
+        this.mapManager.polygonManager.infowindow.close()}
         this.mapManager.cleanup()
 
 
@@ -702,6 +703,7 @@ class PolygonManager {
         this.mapManager = mapManager
         this.wardGeoJsonUrl = wardGeoJsonUrl;
         this.infowindow = null;
+        this.infoboxes = [];
         this.featureData = {};
         this.polygonsVisible = true;
         this.managerID = managerID;
@@ -889,6 +891,7 @@ class BusinessPolygons extends PolygonManager {
         });
 
         this.mapManager.eventListeners.addListener(infoBox)
+        this.infoboxes.push(infoBox)
     }
 }
 
