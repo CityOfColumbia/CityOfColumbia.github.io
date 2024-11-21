@@ -1,1145 +1,130 @@
-//TODO: I think revamping how the map is passed to the managers. We could just have the mapManager pass this.map to them instead of needing to call the functions with mapManager.map
+import MapManager from './MapManager.js';
+import HTMLManager from './HTMLManager.js';
 
-let mapManager
-let htmlManager
-let wards = {
-    'Lisa Meyer':'Ward 2', 
-    'Nick Foster':'Ward 4', 
-    'Valerie Carroll':'Ward 1', 
-    'Roy Lovelady':'Ward 3', 
-    'Donald Waterman':'Ward 5',
-    'Betsy Peters':'Ward 6'
+console.log('script.js is loaded');
 
+let mapManager, htmlManager;
+let isMapInitialized = false;  // Flag to track map initialization
 
-}
-
-let RGBAValues = {
-    'Race':['rgba(30,79,91,.8)','rgba(50,130,150,.8)','rgba(89,173,200,.8)','rgba(116,183,209,.8)','rgba(153,211,221,.8)','rgba(194,229,235,.8)'],
-    'Age':['rgba(34,68,23,.8)','rgba(51,101,34,.8)','rgba(68,142,47,.8)','rgba(95,181,60,.8)','rgba(124,200,90,.8)','rgba(157,213,128,.8)'],
-    'Sex':['rgba(76,31,25,.8)','rgba(110,44,37,.8)','rgba(158,60,53,.8)','rgba(194,77,72,.8)','rgba(212,128,126,.8)','rgba(226,176,167,.8)']
-}
-
-let DemographicHierarchy = {
-    'Black':'Race',
-    'White':'Race',
-    'American Indian and Alaska Native':'Race',
-    'Asian':'Race',
-    'Native Hawaiian and Other Pacific Islander':'Race',
-    'Some Other Race':'Race',
-    'Child':'Age',
-    'Adult':'Age',
-    'Male':'Sex',
-    'Female':'Sex'
-}
-
-function showFeatures(featureType) { //TODO: Clean up this function
-    const featureTables = document.querySelectorAll('.parent-feature-table');
-
-    featureTables.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' ) {
-                input.checked = false;
-            } else if (input.type === 'checkbox') {
-
-                input.checked = true
-
-
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-    });
-
-    const featureTables2 = document.querySelectorAll('.feature-table');
-
-    featureTables2.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Check all options except "All" for non-radio tables
-        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.id !== 'all') {
-                checkbox.checked = true;
-            }
-        });
-    });
-
-    mapManager.cleanup();
-
-    if (featureType === 'Business') {
-        mapManager.createMap('WardOutlines.geojson','data.csv','ADDRESSES_WITH_WARD_LAT_LONG.csv','Business');
-        mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-        document.getElementById('business-controls').style.display = 'block';
-    }
-    
-    if (featureType === 'Demographic') {
-        if(!mapManager.poly)
-            mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-        document.getElementById('demographic-controls').style.display = 'block';
-        mapManager.addZoomOutListeners();
-    }
-}
-
-class HTMLManager {
-  
-    constructor(mapManager) { 
-        this.constructed = true;
-        this.currentTableId = null;
-        this.mapManager = mapManager
-    }
-
-    showFeatures(featureType){
-        const featureTables = document.querySelectorAll('.parent-feature-table');
-
-        featureTables.forEach(table => {
-            table.style.display = 'none';
-            // Reset form elements
-            const inputs = table.querySelectorAll('input');
-            inputs.forEach(input => {
-                if (input.type === 'radio' ) {
-                    input.checked = false;
-                } else if (input.type === 'checkbox') {
-    
-                    input.checked = true
-    
-    
-                }
-            });
-    
-            const selects = table.querySelectorAll('select');
-            selects.forEach(select => {
-                select.selectedIndex = 0;
-            });
-        });
-    
-        const featureTables2 = document.querySelectorAll('.feature-table');
-    
-        featureTables2.forEach(table => {
-            table.style.display = 'none';
-            // Reset form elements
-            const inputs = table.querySelectorAll('input');
-            inputs.forEach(input => {
-                if (input.type === 'radio' || input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                }
-            });
-    
-            const selects = table.querySelectorAll('select');
-            selects.forEach(select => {
-                select.selectedIndex = 0;
-            });
-    
-            // Check all options except "All" for non-radio tables
-            const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                if (checkbox.id !== 'all') {
-                    checkbox.checked = true;
-                }
-            });
-        });
-        if(this.mapManager.polygonManager.infowindow != null){
-        this.mapManager.polygonManager.infowindow.close()}
-        this.mapManager.cleanup()
-
-
-        if (featureType === 'Business') {
-            this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
-            this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-            document.getElementById('business-controls').style.display = 'block';
-        }
-        
-        if (featureType === 'Demographic') {
-            if(!this.mapManager.polygonManager)
-                this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-            document.getElementById('demographic-controls').style.display = 'block';
-            this.mapManager.addZoomOutListeners();
-        }    }
-
-    showTable(tableId) {
-        // Hide all tables and set inputs to false if they were previously selected
-        document.querySelectorAll('.feature-table').forEach(table => {
-            if (table.style.display !== 'none') {
-                this.setInputsFalse(table.querySelectorAll('input'));
-            }
-            table.style.display = 'none';
-        });
-        // Show the selected table
-        document.getElementById(tableId).style.display = 'block';
-        this.currentTableId = tableId;
-    }
-
-    setInputsFalse(inputs){
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            }
-        });
-    }
-
-    setInputstrue(inputs){
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = true;
-            }
-        });
-    }
-}
-
-
-let NAICS_Categories = {
-    11:"Agriculture, Forestry, Fishing, and Hunting",
-    21:"Mining",
-    22:"Utilities",
-    23:"Construction",
-    31:"Manufacturing",
-    32:"Manufacturing",
-    33:"Manufacturing",
-    42:"Wholesale Trade",
-    44:"Retail Trade",
-    45:"Retail Trade",
-    48:"Transportation and Warehousing",
-    49:"Transportation and Warehousing",
-    51:"Information",
-    52:"Finance and Insurance",
-    53:"Real Estate Rental and Leasing",
-    54:"Professional, Scientific, and Technical Services",
-    55:"Management of Companies and Enterprises",
-    56:"Administrative and Support and Waste Management and Remediation Services",
-    61:"Educational Services",
-    62:"Health Care and Social Assistance",
-    71:"Arts, Entertainment, and Recreation",
-    72:"Accommodation and Food Services",
-    81:"Other Services (except Public Administration)",
-    92:"Public Administration",
-    0:"Not Classified"
-}
-
-class EventListenerManager {
-    
-    constructor(mapManager){
-        this.eventListeners = [];
-
-
-    }
-
-    addListener(listener){
-        this.eventListeners.push(listener)
-    }
-
-
-    showListeners(){
-        console.log("Event Listeners!", this.eventListeners)
-    }
-
-
-    cleanup() {
-        this.eventListeners.forEach(listener => {
-            google.maps.event.removeListener(listener);
-        });
-        this.eventListeners = [];
-    }
-
-}
-    
-
-
-class MapManager {
-
-    constructor(){
-        this.hasMarkerSet = {
-            'Business':true,
-            'Demographic':false
-        }
-        this.polygonManagerTypes = {
-            'Business':BusinessPolygons,
-            'Demographic':DemographicPolygons
-        };
-
-        this.markerManagerTypes = {
-            'Business':BusinessMarkers
-        }
-
-        this.map = this.createMapDefinitions();
-        this.eventListeners = null;
-        this.polygonManager = null;
-        this.markerManager = null;
-        this.heatMapZooms = {   
-            1:5,
-            2:5,
-            3:5,
-            4:5,
-            5:5,
-            6:8,
-            7:10,
-            8:20,
-            9:30,
-            10:30,
-            11:30,
-            12:40,
-            13:40,
-            14:40,
-            15:40,
-            16:40,
-            17:40,
-            18:40,
-            19:40,
-            20:40,
-            21:40,
-            22:40
-        };
-    }
-
-    createEventListenerManager(){
-        this.eventListeners = new EventListenerManager(this)
-    }
-
-    createPolygonManager(geoJson, data, managerID){
-        const returnPolygonManager = this.polygonManagerTypes[managerID];
-        this.polygonManager = new returnPolygonManager(this,geoJson,data,managerID)
-    }
-
-    createMarkerManager(latLong,managerID){
-        const returnMarkerManager = this.markerManagerTypes[managerID]
-        this.markerManager = new returnMarkerManager(this,latLong)
-    }
-
-    createMapDefinitions() {
-        return new google.maps.Map(document.getElementById('map'), {
-            zoom: 13,
-            center: { lat: 38.947907, lng: -92.323575 },
-            mapTypeId: 'roadmap',
-            mapTypeControl: false,
-            streetViewControl: false,
-            styles: [
-                // General geometry (background) color
-                { elementType: 'geometry', stylers: [{ color: '#000000' }] },  // Dark gray background
-                
-                // Hide most labels to reduce clutter
-                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },  // Hide icons (like POIs)
-                { elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },  // Light gray text for labels
-                { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },  // Dark stroke around labels
-                
-                // Admin and boundary elements
-                { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },  // Lighter gray for administrative boundaries
-                { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },  // Subtle color for country labels
-                
-                // Hide land parcels (reduces clutter)
-                { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-                
-                // Simplify locality labels
-                { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-    
-                // Points of interest (POIs) – light gray text, but hidden if needed
-                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },  // Light gray POI text
-                { featureType: 'poi', elementType: 'geometry', stylers: [{ visibility: 'off' }] },  // Hide POIs
-                
-                // Parks in dark gray (make them blend with the background)
-                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#424242' }] },
-                { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-    
-                // Road styling (dark, minimalistic)
-                { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },  // Dark gray fill for roads
-                { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },  // Light road labels
-    
-                // Arterial and highway roads in even darker shades
-                { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#3e3e3e' }] },  
-                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#474747' }] },
-                { featureType: 'road.highway.controlled_access', elementType: 'geometry', stylers: [{ color: '#5a5a5a' }] },
-    
-                // Local roads in slightly lighter gray for visibility
-                { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-    
-                // Transit labels in light gray
-                { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-    
-                // Water bodies in dark gray/black to blend seamlessly
-                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },  // Dark gray for water bodies
-                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }  // Water text in dark gray
-            ]
-        });
-    }
-    
-
-
-    addZoomOutListeners() {
-        // Add a hover listener to change the cursor
-        // Listener to ensure polygons and markers turn off once the user zooms out far enough
-        const zoom_change = this.map.addListener('zoom_changed', () => {
-        
-            const mapZoom = this.map.getZoom();
-
-            if (mapZoom < 9 && this.polygonManager.polygonsVisible) {
-                this.polygonManager.togglePolygons(this.map, false);
-                this.polygonManager.polygonsVisible = false;
-                this.markerManager.toggleMarkersOff()
-
-            } else if (mapZoom >= 9 && !this.polygonManager.polygonsVisible) {
-                
-                this.polygonManager.togglePolygons(this.map, true);
-                this.polygonManager.polygonsVisible = true;
-                this.markerManager.toggleMarkersOn();
-                
-            }
-
-        });
-
-        this.eventListeners.addListener(zoom_change);
-
-
-    }
-    
-    placeHeatMap(){  //TODO: Change the heatmap layer to its own class. this should be possible, but this needed to be finished for presentation
-
-    const heatmapData = [];
-
-    this.markerManager.markerDataList.forEach(row => {
-        var lat = parseFloat(row["Lat"]);
-        var lng = parseFloat(row["Long"]);
-        if (!isNaN(lat) && !isNaN(lng)) {
-            var latLng = new google.maps.LatLng(lat, lng);
-            heatmapData.push(latLng);
-        }
-    });
-
-    this.heatmap = new google.maps.visualization.HeatmapLayer({
-        data: heatmapData,
-        gradient: [
-            'rgba(255, 255, 255, 0)', // Transparent at the start
-            'rgba(255, 230, 204, 1)', // Light peach
-            'rgba(255, 204, 153, 1)', // Light orange
-            'rgba(255, 178, 102, 1)', // Medium orange
-            'rgba(255, 153, 51, 1)',  // Strong orange
-            'rgba(255, 127, 0, 1)',   // Reddish orange
-            'rgba(255, 102, 0, 1)',   // Reddish orange
-            'rgba(255, 77, 0, 1)',    // Deep orange
-            'rgba(255, 51, 0, 1)',    // Dark orange-red
-            'rgba(255, 0, 0, 1)'      // Bright red at the highest intensity
-        ],
-        radius: this.getRadius(this.map.getZoom()),
-        opacity: 1
-    });
-    
-
-    this.heatmap.setMap(this.map);
-    const heatmapZoomListener = this.map.addListener('zoom_changed', () => {
-        this.heatmap.set('radius', this.getRadius(this.map.getZoom()));
-
-    });
-    this.eventListeners.addListener(heatmapZoomListener)
-}
-
-    getRadius(zoom){
-
-        return this.heatMapZooms[zoom]
-
-    }
-
-    async createMap(geoJson, polygonData,markerData, mapID){
-
-        this.createEventListenerManager();
-        this.createPolygonManager(geoJson, polygonData,mapID);
-        this.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-
-        if(this.hasMarkerSet[mapID] == true){
-            this.createMarkerManager(markerData,mapID);
-            await this.markerManager.placeOnLatLong(mapManager.markerManager.data);
-            this.placeHeatMap()
-        }
-
-        this.addZoomOutListeners();
-
-    }
-
-
-
-    cleanup(){
-        // this.eventListeners.forEach(listener => {
-        //     console.log("listener:", listener)
-        //     this.map.event.removeListener(listener);
-        // });
-        if(this.eventListeners){
-        this.eventListeners.cleanup();}
-
-
-        if(this.polygonManager){
-        this.polygonManager.cleanup();}
-        this.polygonManager = null;
-        
-        if(this.markerManager){
-        this.markerManager.cleanup();}
-        this.markerManager = null;
-        
-        if(this.heatmap){
-        this.heatmap.setMap(null);}
-        this.heatmap = null;
-    }
-
-
-}
-
-
-class MarkersManager {
-    constructor(mapManager,latLong){
-        this.mapManager = mapManager
-        this.data = this.loadCSV(latLong);
-        this.markerDataList = []; //TODO: rename this list to something more intuitive, like markers
-
-    }
-
-    async loadCSV(url){
-        const response = await fetch(url);
-        const csvText = await response.text();
-        const parsedData = Papa.parse(csvText, {
-            header: true,
-            dynamicTyping: true
-        }).data;
-    
-        // Filter out any undefined entries
-        const filteredData = parsedData.filter(row => row !== undefined);
-        return filteredData;
-    }
-
-    toggleMarkersOff() {
-        this.markerDataList.forEach(markerDict => {
-            if (markerDict.isVisible == true) {
-                markerDict.isVisible = false;
-                markerDict.Marker.setMap(null);
-            }
-        });
-    }
-
-    toggleMarkersOn() {
-
-        this.markerDataList.forEach(markerDict => {
-            if (markerDict.isVisible == false) {
-                markerDict.isVisible = true;
-                markerDict.Marker.setMap(this.mapManager.map);
-            }
-        });
-    }
-
-    toggleGroup(group) {
-
-        if (marker_groups[group]) {
-
-            // Toggle the visibility state
-            groupVisibility[group] = !groupVisibility[group]
-
-            marker_groups[group].forEach(marker => {
-
-                if (groupVisibility[group]) {
-                    marker.setMap(this.mapManager.map); // Show marker
-
-
-                } else {
-                    marker.setMap(null); // Hide marker
-                }
-
-            });
-
-        }
-    }
-
-    addMarkerData(keys, values){
-
-        let returnMarkerDict = {};
-
-        if(keys.length == values.length){
-
-            for(let i = 0; i < keys.length; i++){
-
-                returnMarkerDict[keys[i]] = values[i];
-
-            }
-
-        } else {
-            console.log("Keys and Values not 1 to 1 for marker data creation");
-        };
-        return returnMarkerDict;
-    }
-
-    cleanup(){
-
-        this.markerDataList.forEach(markerData => {
-            markerData["Marker"].setMap(null);
-
-        });
-
-        this.markerDataList = []
-    }
-
-    testfunc(){
-        console.log("List of Markers!:", this.markerDataList)
-    }
-}
-
-class BusinessMarkers extends MarkersManager{
-    constructor(mapManager, latlong){
-        super(mapManager,latlong);
-    }
-
-    async placeOnLatLong(csvDataPromise) {
-        const csvData = await csvDataPromise;
-        const infoWindow = new google.maps.InfoWindow();
-        const markerIcon = {
-            path: google.maps.SymbolPath.CIRCLE,  // Simple circle icon
-            fillColor: "#FFFFFF",  // Light color (white) to contrast with black background
-            fillOpacity: 0.7,  // Slight transparency to blend with the heatmap
-            strokeColor: "#FF5733",  // Border matching heatmap's orangish color
-            strokeWeight: 1,  // Thin border to reduce clutter
-            scale: 2,  // Small size for a subtle presence (adjust for visibility)
-        };
-
-        csvData.forEach(row => {
-            const keys = ["Marker","Name","Ward","Naics","Business Type","isVisible","Lat","Long"]
-            const values = []
-            const lat = parseFloat(row.Latitude);
-            const long = parseFloat(row.Longitude);
-
-            let numberPart;
-
-    
-            if (!isNaN(lat) && !isNaN(long)) {
-                const marker = new google.maps.Marker({
-                    position: { lat: lat, lng: long },
-                    map: this.mapManager.map,
-                    icon: markerIcon,
-                    title: typeof row.LocAcctName === 'string' ? row.LocAcctName : String(row.LocAcctName)
-                });
-
-                values.push(marker,row.LocAcctName, wards[row.Representative])
-
-                 if (row.NaicsCode) {
-                    numberPart= row.NaicsCode
-                    values.push(numberPart, null, true, lat, long)
-                } else {
-                    values.push(null,null, true, lat, long)
-
-                }
-
-                this.markerDataList.push(this.addMarkerData(keys,values));
-    
-                // Add click listener to each marker
-                marker.addListener("click", () => {
-                    const numberPart = row.NaicsCode ? row.NaicsCode : '';
-                    const category = row.NaicsCode ? NAICS_Categories[String(row.NaicsCode).substring(0, 2)] : 'N/A';
-                    const descriptionPart = row.descriptionPart ? row.descriptionPart : '';
-                
-                    const contentString = `
-                        <div>
-                            <h3>${row.LocAcctName}</h3>
-                            <ul>
-                                <li>Address: ${row.Address}</li>
-                                <li>Ward: ${wards[row.Representative]}</li>
-                                ${row.NaicsCode ? `<li>NAICS Code: ${numberPart}</li>` : ''}
-                                <li>Category: ${category}</li>
-                            </ul>
-                        </div>
-                    `;
-                
-                    infoWindow.close();
-                    infoWindow.setContent(contentString);
-                    infoWindow.open(marker.getMap(), marker);
-                });
-            }
-        });
-    }
-
-    toggleGroup(key,group) {
-     
-        this.markerDataList.forEach(marker =>{
-
-            if(marker[key] == group){
-
-                if(marker['isVisible'] == true){
-
-                    marker['isVisible'] = !marker['isVisible']
-                    marker['Marker'].setMap(null)
-
-                }
-
-                else if(marker['isVisible'] == false){
-
-                    marker['isVisible'] = !marker['isVisible']
-                    marker['Marker'].setMap(this.mapManager.map)
-
-                }
-
-            }
-
-        })
-        
-    }
-
-    toggleAll() {
-        let toggle = document.getElementById("all").checked;
-        const featureTables = document.querySelectorAll('.parent-feature-table');
-    
-        featureTables.forEach(table => {
-            // Reset form elements
-            const inputs = table.querySelectorAll('input');
-            inputs.forEach(input => {
-
-            if (input.type === 'checkbox') {
-                    input.checked = toggle;
-                }
-            });
-        });
-    
-        this.markerDataList.forEach(marker => {
-            marker["isVisible"] = toggle;
-            marker["Marker"].setMap(toggle ? this.mapManager.map : null);
-        });
-    }
-    
-
-
-    showMarkers(){
-        console.log(this.markerDataList)
-    }
-}
-
-
-
-class PolygonManager {
-    constructor(mapManager, wardGeoJsonUrl, managerID) {
-        this.mapManager = mapManager
-        this.wardGeoJsonUrl = wardGeoJsonUrl;
-        this.infowindow = null;
-        this.infoboxes = [];
-        this.featureData = {};
-        this.polygonsVisible = true;
-        this.managerID = managerID;
-        this.polygons = {};
-        this.loadBooneCounty()
-        this.loadWardGeoJson();
-    }
-
-    async loadBooneCounty() {
-        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
-            features.forEach((feature) => {
-                feature.setProperty('visible', true);
-                let countyName = 'Boone County';
-                if (!this.polygons[countyName]) {
-                    this.polygons[countyName] = [];
-                }
-                this.polygons[countyName].push(feature);
-            });
-        });
-    }
-
-    async loadWardGeoJson() {
-        this.mapManager.map.data.loadGeoJson(this.wardGeoJsonUrl, null, (features) => {
-            features.forEach((feature) => {
-                feature.setProperty('visible', true);
-                let wardName = wards[feature.getProperty('Name')];
-                if (!this.polygons[wardName]) {
-                    this.polygons[wardName] = [];
-                }
-                this.polygons[wardName].push(feature);
-            });
-        });
-    }
-
-    setAllStyle(fillColor,fillOpacity,strokeColor,strokeWeight) {
-        this.mapManager.map.data.setStyle({
-            fillColor: fillColor, // Change this to your desired hex color
-            fillOpacity: fillOpacity,
-            strokeColor: strokeColor, // Change this to your desired hex color
-            strokeWeight: strokeWeight
-        });
-    }
-
-    setStyle(feature,fillColor,fillOpacity,strokeColor,strokeWeight){
-        this.mapManager.map.data.overrideStyle(feature, {
-            fillColor: fillColor,
-            fillOpacity: fillOpacity,
-            strokeColor: strokeColor,
-            strokeWeight: strokeWeight
-        });
-    }
-
-    togglePolygonsVisibility() {
-        this.polygonsVisible = !this.polygonsVisible;
-        this.mapManager.map.data.setStyle({
-            visible: this.polygonsVisible
-        });
-    }
-    togglePolygons(){
-        this.mapManager.map.data.forEach(function(feature) {
-          const isVisible = feature.getProperty('visible');
-          feature.setProperty('visible', !isVisible);
-        });
-
-        this.mapManager.map.data.setStyle(function(feature) {
-          return {
-            fillColor: '#FFFFFF', // Change this to your desired hex color
-            fillOpacity: 0,
-            strokeColor: '#FFFFFF', // Change this to your desired hex color
-            strokeWeight: 2,
-            visible: feature.getProperty('visible')
-          };
-        });
-      }
-      
-    cleanup() {
-        // Remove all event listeners and clear data
-        // this.eventListeners.forEach(listener => {
-        //     this.map.event.removeListener(listener);
-        // });
-
-        this.eventListeners = [];
-
-        this.mapManager.map.data.forEach((feature) => {
-            if (feature.getProperty('managerId') === this.managerId) {
-                this.mapManager.map.data.remove(feature);
-            }
-        });
-        this.mapManager.map.data.setStyle(null); // Reset styles
-        // Additional cleanup logic if needed
-    }
-};
-
-class BusinessPolygons extends PolygonManager {
-    constructor(mapManager, geoJsonUrl, polygonData,managerID) {
-        super(mapManager, geoJsonUrl, polygonData,managerID);
-        this.infowindow = null; // Define infowindow as a property of the class
-        this.csvUrl = polygonData;
-        this.loadWardData()
-        this.addInfoBoxes();
-    }
-
-    loadWardData() {
-        fetch(this.csvUrl)
-            .then(response => response.text())
-            .then(csvText => {
-                const rows = csvText.split('\n');
-                const headers = rows[0].split(',');
-                rows.slice(1).forEach(row => {
-                    const values = row.split(',');
-                    const name = values[0];
-                    this.featureData[name] = {};
-                    headers.forEach((header, index) => {
-                        let value = values[index];
-                        let parsedValue = parseFloat(value);
-                        if (Number.isInteger(parsedValue)) {
-                            value = '$' + parsedValue.toLocaleString(); // Format the number with commas
-                        }
-                        this.featureData[name][header] = value;
-                    });
-                });
-            });
-    }
-
-    addInfoBoxes() {
-        const infoBox = this.mapManager.map.data.addListener('click', (event) => {
-            const featureName = event.feature.getProperty('Name');
-
-            // Check if the feature's name is in the targetNames array
-            if (!(featureName in wards)) {
-                return; // Exit the function if the feature's name is not in the list
-            }
-
-            if (this.infowindow) {
-                this.infowindow.close();
-            }
-
-            const featureInfo = this.featureData[featureName] || {};
-            const geometry = event.feature.getGeometry();
-            const bounds = new google.maps.LatLngBounds();
-            geometry.forEachLatLng((latlng) => {
-                bounds.extend(latlng);
-            });
-
-            const center = bounds.getCenter();
-
-            let content = `
-                <title>Feature Info Table</title>
-                <style>
-                    #infoTable {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    #infoTable th, #infoTable td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                    }
-                    #infoTable th {
-                        background-color: #f2f2f2;
-                        text-align: left;
-                    }
-                </style>
-                <table id="infoTable">
-                <caption style="font-weight: bold">${wards[featureName]}</caption>
-                    <tbody>`;
-
-            for (const [property, value] of Object.entries(featureInfo)) {
-                content += `
-                        <tr>
-                            <td>${property}</td>
-                            <td>${value ? value : 'N/A'}</td>
-                        </tr>`;
-            }
-
-            content += `
-                    </tbody>
-                </table>`;
-
-            this.infowindow = new google.maps.InfoWindow({
-                content: content,
-                position: center,
-                disableAutoPan: true
-            });
-            this.infowindow.open(this.mapManager.map);
-        });
-
-        this.mapManager.eventListeners.addListener(infoBox)
-        this.infoboxes.push(infoBox)
-    }
-}
-
-class DemographicPolygons extends PolygonManager {
-    constructor(map, geoJsonUrl, polygonData, managerID) {
-        super(map, geoJsonUrl, managerID);
-        this.csvData = polygonData;
-        this.loadWardData().then(({ dataList,wardRankings, minMaxValues }) => {
-            this.wardData = dataList;
-            this.wardRankings = wardRankings
-            this.minMaxValues = minMaxValues;
-            this.addInfoBoxes()
-            console.log("in demoPolygons, minMaxValues", this.minMaxValues)
-            console.log("in demopolygons, wardrankings", this.wardRankings)
-
-        });
-    }
-
-    async loadWardData() {
-        const dataList = {};
-        const minMaxValues = {};
-        const wardRankings = {};
-    
-        try {
-            const response = await fetch(this.csvData);
-            const csvText = await response.text();
-            const rows = csvText.split('\n');
-            const headers = rows[0].split(',');
-    
-            // Initialize minMaxValues with Infinity and -Infinity
-            headers.forEach(header => {
-                minMaxValues[header.trim()] = [Infinity, -Infinity];
-            });
-    
-            rows.slice(1).forEach(row => {
-                const values = row.split(',');
-                const ward = "Ward " + values[headers.indexOf('Ward')].trim(); // Get the Ward value and trim any extra spaces
-    
-                if (ward !== "Ward All") { // Skip "Ward All"
-                    const rowDict = {};
-                    headers.forEach((header, index) => {
-                        if (header.trim() !== 'Ward') {
-                            let value = values[index]; // Remove \r from the value
-                            rowDict[header.trim()] = Number(value); // Trim header to remove any extra spaces
-    
-                            // Update min and max values
-                            const numValue = parseFloat(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < minMaxValues[header.trim()][0]) {
-                                    minMaxValues[header.trim()][0] = numValue;
-                                }
-                                if (numValue > minMaxValues[header.trim()][1]) {
-                                    minMaxValues[header.trim()][1] = numValue;
-                                }
-                            }
-                        }
-                    });
-    
-                    if (!dataList[ward]) {
-                        dataList[ward] = {};
-                    }
-                    dataList[ward] = rowDict;
-                }
-            });
-    
-            // Calculate ranks for each demographic
-            headers.forEach(header => {
-                if (header.trim() !== 'Ward') {
-                    const demographicValues = [];
-                    for (const ward in dataList) {
-                        demographicValues.push({ ward, value: dataList[ward][header.trim()] });
-                    }
-                    demographicValues.sort((a, b) => b.value - a.value); // Sort in descending order
-    
-                    demographicValues.forEach((item, index) => {
-                        if (!wardRankings[item.ward]) {
-                            wardRankings[item.ward] = {};
-                        }
-                        wardRankings[item.ward][header.trim()] = index + 1; // Rank starts from 1
-                    });
-                }
-            });
-    
-            console.log("Ward Rankings:", wardRankings);
-            return { dataList, wardRankings, minMaxValues };
-        } catch (error) {
-            console.error('Error loading CSV data:', error);
-            return { dataList: {}, wardRankings: {}, minMaxValues: {} };
-        }
-    }
-    
-    getWardData(){
-        return this.wardData
-    }
-
-    addInfoBoxes() {
-        const infoBox = this.mapManager.map.data.addListener('click', (event) => {
-            // Check if data is loaded
-            const featureName = event.feature.getProperty('Name');
-    
-            // Check if the feature's name is in the targetNames array
-            if (!(featureName in wards)) {
-                return; // Exit the function if the feature's name is not in the list
-            }
-    
-            if (this.infowindow) {
-                this.infowindow.close();
-            }
-    
-            // Get the selected demographic category
-            const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
-            if (!selectedDemographic) {
-                return
-            }
-
-            const subCategoryName = selectedDemographic.id;
-            const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
-            const featureInfo = this.wardData[wards[featureName]] || {};
-            const demographicData = featureInfo[selectedSubCategory.id] || {};
-            const geometry = event.feature.getGeometry();
-            const bounds = new google.maps.LatLngBounds();
-            geometry.forEachLatLng((latlng) => {
-                bounds.extend(latlng);
-            });
-    
-            const center = bounds.getCenter();
-    
-            let content = `
-                <title>Feature Info Table</title>
-                <style>
-                    #infoTable {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    #infoTable th, #infoTable td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                    }
-                    #infoTable th {
-                        background-color: #f2f2f2;
-                        text-align: left;
-                    }
-                </style>
-                <table id="infoTable">
-                <caption style="font-weight: bold">${wards[featureName]}</caption>
-                    <tbody>`;
-    
-
-                content += `
-                        <tr>
-                            <td>${selectedSubCategory.id.toLocaleString()}</td>
-                            <td>${demographicData.toLocaleString()}</td>
-                        </tr>`;
-            
-    
-            content += `
-                    </tbody>
-                </table>`;
-    
-            this.infowindow = new google.maps.InfoWindow({
-                content: content,
-                position: center,
-                disableAutoPan: true
-            });
-            this.infowindow.open(this.mapManager.map);
-        });
-        this.mapManager.eventListeners.addListener(infoBox);
-    }
-    
-
-    //this getColor function is depricated
-//     getColor(value, min, max) { 
-//         // Normalize the value to a range between 0 and 1
-//         const normalized = (value - min) / (max - min);
-        
-//         // Calculate the gradient components
-//         const r = 255; // Red remains 255
-//         const g = Math.floor(255 * (1 - normalized)); // Green decreases as value increases
-//         const b = 0; // Blue remains 0
-        
-//         // Ensure alpha is between 0.3 and 0.8
-//         const a = .8; // Adjusted to fit your range
-        
-//         return `rgba(${r}, ${g}, ${b}, ${a})`;
-//     }
-    
-    getColor(rank,option){
-        // console.log("in get color: option, Demohierachy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank-1 " , option, DemographicHierarchy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank -1)
-        return RGBAValues[DemographicHierarchy[option]][rank - 1]
-    }
-}
-    
-
-
-//uses self.polygons, which will have multiple dictionaries of {Ward X: Feature}, potentially multiple Ward X
-function setDemographicMapStyle(option){
-
-let demographics = mapManager.polygonManager.wardData;
-
-let rgbValues = []
-for(let i = 0; i<= 5; i++){
-    console.log("In set demographicmapstyle TEST")
-    console.log("showing mapManager ward rankings", mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
-    rgbValues.push(mapManager.polygonManager.getColor(mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
-    console.log("In set demographicmapstyle TEST")
-
-    // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
-}
-console.log("in setDemographicMapStyle, rgba", rgbValues)
-
-for (let i = 1; i <= 6; i++){
-    let wardString = "Ward " + i;
-    for(let feature of mapManager.polygonManager.polygons[wardString]){
-        mapManager.polygonManager.setStyle(feature,rgbValues[i-1],1,'#FFFFFF',2)
-    }
-}
-
-}
-
-// Usage example:
-async function initMap(){
+window.initMap = async function () {
+    console.log('initMap is loaded');
     mapManager = new MapManager();
     htmlManager = new HTMLManager(mapManager);
-    mapManager.createMap("WardOutlines.geojson","data.csv","addresses_with_wards_NEW.csv","Business")
+    mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business");
 
+    // Set the flag to true once the map has been initialized
+    isMapInitialized = true;
 };
+
+// Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
+function safeToggleGroup(group, id) {
+    if (isMapInitialized) {
+        mapManager.markerManager.toggleGroup(group, id);
+    } else {
+        console.log('mapManager is not initialized yet.');
+    }
+}
+
+function safeToggleAll() {
+    if (isMapInitialized) {
+        mapManager.markerManager.toggleAll();
+    } else {
+        console.log('mapManager is not initialized yet.');
+    }
+}
+
+function setDemographicMapStyle(option){
+
+    let demographics = mapManager.polygonManager.wardData;
+    
+    let rgbValues = []
+    for(let i = 0; i<= 5; i++){
+        console.log("showing mapManager ward rankings", mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
+        rgbValues.push(mapManager.polygonManager.getColor(mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
+        console.log("In set demographicmapstyle TEST")
+    
+        // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
+    }
+    console.log("in setDemographicMapStyle, rgba", rgbValues)
+    
+    for (let i = 1; i <= 6; i++){
+        let wardString = "Ward " + i;
+        for(let feature of mapManager.polygonManager.polygons[wardString]){
+            mapManager.polygonManager.setStyle(feature,rgbValues[i-1],1,'#FFFFFF',2)
+        }
+    }
+    
+    }
+
+
+function safeSetDemographicStyle(demographic) {
+    if (isMapInitialized) {
+        setDemographicMapStyle(demographic); // Assuming you have a function for setting demographic style
+    } else {
+        console.log('mapManager is not initialized yet.');
+    }
+}
+
+// Attach event listeners when the page loads, but only call the mapManager methods when it's ready
+document.addEventListener('DOMContentLoaded', function() {
+    const wardCheckboxes = document.querySelectorAll('[id^="Ward"]');
+    wardCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener('click', function(event) {
+            const wardId = event.target.id;
+            safeToggleGroup('Ward', wardId);
+        });
+    });
+
+    const allCheckbox = document.getElementById('all');
+    if (allCheckbox) {
+        allCheckbox.addEventListener('click', function() {
+            safeToggleAll();
+        });
+    }
+
+    // Feature Toggle Radio Buttons (Demographic / Business)
+    const featureRadios = document.querySelectorAll('input[name="feature"]');
+    featureRadios.forEach((radio) => {
+        radio.addEventListener('click', function(event) {
+            const feature = event.target.value;
+            htmlManager.showFeatures(feature); // Assuming this method exists
+        });
+    });
+
+    // Demographic Controls (race, age, sex)
+    const demographicRadios = document.querySelectorAll('input[name="demographic"]');
+    demographicRadios.forEach((radio) => {
+        radio.addEventListener('click', function(event) {
+            const demographicId = event.target.id;
+            htmlManager.showTable(demographicId + '-controls'); // Assuming this method exists
+
+            // Set the demographic style for the map based on the selection
+            switch (demographicId) {
+                case 'race':
+                    const raceRadios = document.querySelectorAll('input[name="race"]');
+                    raceRadios.forEach((radio) => {
+                        radio.addEventListener('click', function() {
+                            safeSetDemographicStyle(radio.id);
+                        });
+                    });
+                    break;
+                case 'age':
+                    const ageRadios = document.querySelectorAll('input[name="age"]');
+                    ageRadios.forEach((radio) => {
+                        radio.addEventListener('click', function() {
+                            safeSetDemographicStyle(radio.id);
+                        });
+                    });
+                    break;
+                case 'sex':
+                    const sexRadios = document.querySelectorAll('input[name="sex"]');
+                    sexRadios.forEach((radio) => {
+                        radio.addEventListener('click', function() {
+                            safeSetDemographicStyle(radio.id);
+                        });
+                    });
+                    break;
+            }
+        });
+    });
+});
