@@ -124,6 +124,52 @@ input[type="radio"]:hover, input[type="checkbox"]:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
+/* Styling for a demographic map legend. */
+.demographic-map-legend {
+    display: block;
+    position: fixed;
+    top: 10px; /* Adjust the value as needed */
+    right: 10px; /* Adjust the value as needed */
+    width: 300px; /* Adjust the width as needed */
+    height: 100px; /* Adjust the height as needed */
+    background-color: #f0f0f0; /* Change the background color as needed */
+    border: 1px solid #ccc; /* Optional: Add a border */
+    padding: 10px; /* Optional: Add padding inside the box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for some depth */
+}
+
+/* These features below help format the map legend */
+.row {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px; /* Space between rows */
+}
+
+.column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.full-width {
+    width: 100%;
+    font-weight: bold;
+    text-align: center;
+}
+
+.small-width {
+    width: 15%; /* Adjust the width as needed */
+}
+
+.large-width {
+    width: 70%; /* Adjust the width as needed */
+}
+
+.map-image {
+    max-width: 100%;
+    height: auto;
+}
+
 /* Styling for the 'active' state of the feature toggle buttons */
 input[type="radio"]:checked + label {
     color: #ff6600;

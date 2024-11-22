@@ -1,3 +1,4 @@
+import { ImageSources } from './definitions.js';
 
 class HTMLManager {
   
@@ -97,7 +98,12 @@ class HTMLManager {
         });
         // Show the selected table
         document.getElementById(tableId).style.display = 'block';
+        this.changeMapKeyImage(tableId)
         this.currentTableId = tableId;
+    }
+
+    changeMapKeyImage(tableId){
+        document.getElementById('map-image').src = ImageSources[tableId]
     }
 
     setInputsFalse(inputs){
