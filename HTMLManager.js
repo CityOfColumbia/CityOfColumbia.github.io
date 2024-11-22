@@ -98,7 +98,6 @@ class HTMLManager {
         });
         // Show the selected table
         document.getElementById(tableId).style.display = 'block';
-        this.changeMapKeyImage(tableId)
         this.currentTableId = tableId;
     }
 
@@ -114,7 +113,7 @@ class HTMLManager {
         });
     }
 
-    setInputstrue(inputs){
+    setInputsTrue(inputs){
         inputs.forEach(input => {
             if (input.type === 'radio' || input.type === 'checkbox') {
                 input.checked = true;
