@@ -113,7 +113,7 @@ class HTMLManager {
         });
     }
 
-    setInputstrue(inputs){
+    setInputsTrue(inputs){
         inputs.forEach(input => {
             if (input.type === 'radio' || input.type === 'checkbox') {
                 input.checked = true;
