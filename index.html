@@ -53,7 +53,7 @@
                     Most
                 </div>
                 <div class="column large-width">
-                    <img id = "map-image" src="Race-Gradient.png" alt="Map Image" class="map-image">
+                    <img id = "map-image" src="Demographic-Map-Gradient.png" alt="Map Image" class="map-image">
                 </div>
                 <div class="column small-width">
                     Least
@@ -73,33 +73,33 @@
                 <td colspan="2">
                     <div class="race-options">
                         <div class="race-option">
-                            <input type="radio" id="Black" name="race" onclick="setDemographicMapStyle('Black')"> Black or African American
+                            <input type="radio" id="Black" name="race" onclick="safeSetDemographicStyle('Black')"> Black or African American
                         </div>
                         <div class="race-option">
-                            <input type="radio" id="White" name="race" onclick="setDemographicMapStyle('White')"> White
+                            <input type="radio" id="White" name="race" onclick="safeSetDemographicStyle('White')"> White
                         </div>
                         <div class="race-option">
-                            <input type="radio" id="American Indian and Alaska Native" name="race" onclick="setDemographicMapStyle('American Indian and Alaska Native')"> American Indian and Alaska Native
+                            <input type="radio" id="American Indian and Alaska Native" name="race" onclick="safeSetDemographicStyle('American Indian and Alaska Native')"> American Indian and Alaska Native
                         </div>
                         <div class="race-option">
-                            <input type="radio" id="Asian" name="race" onclick="setDemographicMapStyle('Asian')"> Asian
+                            <input type="radio" id="Asian" name="race" onclick="safeSetDemographicStyle('Asian')"> Asian
                         </div>
                         <div class="race-option">
-                            <input type="radio" id="Native Hawaiian and Other Pacific Islander" name="race" onclick="setDemographicMapStyle('Native Hawaiian and Other Pacific Islander')"> Native Hawaiian and Other Pacific Islander
+                            <input type="radio" id="Native Hawaiian and Other Pacific Islander" name="race" onclick="safeSetDemographicStyle('Native Hawaiian and Other Pacific Islander')"> Native Hawaiian and Other Pacific Islander
                         </div>
                         <div class="race-option">
-                            <input type="radio" id="Some Other Race" name="race" onclick="setDemographicMapStyle('Some Other Race')"> Some Other Race
+                            <input type="radio" id="Some Other Race" name="race" onclick="safeSetDemographicStyle('Some Other Race')"> Some Other Race
                         </div>
                     </div>
                 </td>
             </tr>
             <tr id="age-controls" class="feature-table" style="display: none;">
-                <td><input type="radio" id="Child" name="age" onclick="setDemographicMapStyle('Child')"> Child (Under 18)</td>
-                <td><input type="radio" id="Adult" name="age" onclick="setDemographicMapStyle('Adult')"> Adult (18 or Older)</td>
+                <td><input type="radio" id="Child" name="age" onclick="safeSetDemographicStyle('Child')"> Child (Under 18)</td>
+                <td><input type="radio" id="Adult" name="age" onclick="safeSetDemographicStyle('Adult')"> Adult (18 or Older)</td>
             </tr>
             <tr id="sex-controls" class="feature-table" style="display: none;">
-                <td><input type="radio" id="Male" name="sex" onclick="setDemographicMapStyle('Male')"> Male</td>
-                <td><input type="radio" id="Female" name="sex" onclick="setDemographicMapStyle('Female')"> Female</td>
+                <td><input type="radio" id="Male" name="sex" onclick="safeSetDemographicStyle('Male')"> Male</td>
+                <td><input type="radio" id="Female" name="sex" onclick="safeSetDemographicStyle('Female')"> Female</td>
             </tr>
         </table>
     </div>
