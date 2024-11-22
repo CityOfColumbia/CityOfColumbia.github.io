@@ -16,10 +16,13 @@ window.initMap = async function () {
 };
 
 window.safeSetDemographicStyle = safeSetDemographicStyle
+window.safeToggleAll = safeToggleAll
+window.safeToggleGroup = safeToggleGroup
+
 // Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
 function safeToggleGroup(group, id) {
     if (isMapInitialized) {
-        mapManager.markerManager.toggleGroup(group, id);
+        window.mapManager.markerManager.toggleGroup(group, id);
     } else {
         console.log('mapManager is not initialized yet.');
     }
@@ -27,7 +30,7 @@ function safeToggleGroup(group, id) {
 
 function safeToggleAll() {
     if (isMapInitialized) {
-        mapManager.markerManager.toggleAll();
+        window.mapManager.markerManager.toggleAll();
     } else {
         console.log('mapManager is not initialized yet.');
     }
@@ -35,12 +38,11 @@ function safeToggleAll() {
 
 function setDemographicMapStyle(option){
 
-    let demographics = mapManager.polygonManager.wardData;
     
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
-        console.log("showing mapManager ward rankings", mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
-        rgbValues.push(mapManager.polygonManager.getColor(mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
+        console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
+        rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option],option))
         console.log("In set demographicmapstyle TEST")
     
         // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
@@ -49,8 +51,8 @@ function setDemographicMapStyle(option){
     
     for (let i = 1; i <= 6; i++){
         let wardString = "Ward " + i;
-        for(let feature of mapManager.polygonManager.polygons[wardString]){
-            mapManager.polygonManager.setStyle(feature,rgbValues[i-1],1,'#FFFFFF',2)
+        for(let feature of  window.mapManager.polygonManager.polygons[wardString]){
+            window.mapManager.polygonManager.setStyle(feature,rgbValues[i-1],1,'#FFFFFF',2)
         }
     }
     
