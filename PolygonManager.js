@@ -409,10 +409,15 @@ export class DemographicPolygons extends PolygonManager {
         
 //         return `rgba(${r}, ${g}, ${b}, ${a})`;
 //     }
+
+//DEPRICATED , Use this one if you want to have options between the demographics
+// getColor(rank,option){
+//         return RGBAValues[DemographicHierarchy[option]][rank - 1]
+//     }
     
-    getColor(rank,option){
+    getColor(rank){
         // console.log("in get color: option, Demohierachy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank-1 " , option, DemographicHierarchy[option], RGBAValues[DemographicHierarchy[option]][rank - 1], rank -1)
-        return RGBAValues[DemographicHierarchy[option]][rank - 1]
+        return RGBAValues[rank - 1]
     }
 }
 

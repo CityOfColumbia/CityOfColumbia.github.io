@@ -7,11 +7,14 @@ export const wards = {
     'Betsy Peters': 'Ward 6'
 };
 
-export const RGBAValues = {
-    'Race': ['rgba(30,79,91,.8)', 'rgba(50,130,150,.8)', 'rgba(89,173,200,.8)', 'rgba(116,183,209,.8)', 'rgba(153,211,221,.8)', 'rgba(194,229,235,.8)'],
-    'Age': ['rgba(34,68,23,.8)', 'rgba(51,101,34,.8)', 'rgba(68,142,47,.8)', 'rgba(95,181,60,.8)', 'rgba(124,200,90,.8)', 'rgba(157,213,128,.8)'],
-    'Sex': ['rgba(76,31,25,.8)', 'rgba(110,44,37,.8)', 'rgba(158,60,53,.8)', 'rgba(194,77,72,.8)', 'rgba(212,128,126,.8)', 'rgba(226,176,167,.8)']
-};
+//Depricated rgba values. this format is how we would establish rgb valeus specific to each demographic
+// export const RGBAValues = {
+//     'Race': ['rgba(30,79,91,.8)', 'rgba(50,130,150,.8)', 'rgba(89,173,200,.8)', 'rgba(116,183,209,.8)', 'rgba(153,211,221,.8)', 'rgba(194,229,235,.8)'],
+//     'Age': ['rgba(34,68,23,.8)', 'rgba(51,101,34,.8)', 'rgba(68,142,47,.8)', 'rgba(95,181,60,.8)', 'rgba(124,200,90,.8)', 'rgba(157,213,128,.8)'],
+//     'Sex': ['rgba(76,31,25,.8)', 'rgba(110,44,37,.8)', 'rgba(158,60,53,.8)', 'rgba(194,77,72,.8)', 'rgba(212,128,126,.8)', 'rgba(226,176,167,.8)']
+// };
+
+export const RGBAValues = ['rgba(255, 230, 204, 1)', 'rgba(255, 178, 102, 1)','rgba(255, 153, 51, 1)','rgba(255, 127, 0, 1)','rgba(255, 77, 0, 1)','rgba(255, 0, 0, 1)']
 
 export const DemographicHierarchy = {
     'Black': 'Race',

@@ -98,7 +98,6 @@ class HTMLManager {
         });
         // Show the selected table
         document.getElementById(tableId).style.display = 'block';
-        this.changeMapKeyImage(tableId)
         this.currentTableId = tableId;
     }
 
