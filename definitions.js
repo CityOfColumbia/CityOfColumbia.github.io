@@ -53,3 +53,9 @@ export const NAICS_Categories = {
     92: "Public Administration",
     0: "Not Classified"
 };
+
+export const ImageSources = {
+    'race-controls': 'Race-Gradient.png',
+    'age-controls': 'Age-Gradient.png',
+    'sex-controls': 'Sex-Gradient.png'
+}
