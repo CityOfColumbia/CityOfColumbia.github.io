@@ -132,10 +132,14 @@ input[type="radio"]:hover, input[type="checkbox"]:hover {
     right: 10px; /* Adjust the value as needed */
     width: 300px; /* Adjust the width as needed */
     height: 100px; /* Adjust the height as needed */
-    background-color: #f0f0f0; /* Change the background color as needed */
-    border: 1px solid #ccc; /* Optional: Add a border */
+    background-color: rgba(0, 0, 0, 0.7); /* Darker background similar to feature-table */
+    color: white; /* Text color to contrast with dark background */
+    border-radius: 8px; /* Rounded corners like feature-table */
     padding: 10px; /* Optional: Add padding inside the box */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for some depth */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); /* Subtle shadow like feature-table */
+    border: none; /* Remove the border to match feature-table's style */
+    font-family: Arial, sans-serif; /* Match the font family from the controls */
+
 }
 
 /* These features below help format the map legend */
@@ -169,6 +173,7 @@ input[type="radio"]:hover, input[type="checkbox"]:hover {
     max-width: 100%;
     height: auto;
 }
+
 
 /* Styling for the 'active' state of the feature toggle buttons */
 input[type="radio"]:checked + label {
