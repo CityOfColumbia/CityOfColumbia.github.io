@@ -3,19 +3,19 @@ import HTMLManager from './HTMLManager.js';
 
 console.log('script.js is loaded');
 
-let mapManager, htmlManager;
 let isMapInitialized = false;  // Flag to track map initialization
 
 window.initMap = async function () {
     console.log('initMap is loaded');
-    mapManager = new MapManager();
-    htmlManager = new HTMLManager(mapManager);
-    mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business");
+    window.mapManager = new MapManager();
+    window.htmlManager = new HTMLManager(mapManager);
+    window.mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business");
 
     // Set the flag to true once the map has been initialized
     isMapInitialized = true;
 };
 
+window.setDemographicMapStyle = setDemographicMapStyle
 // Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
 function safeToggleGroup(group, id) {
     if (isMapInitialized) {
