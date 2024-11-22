@@ -71,6 +71,9 @@ class MapManager {
             mapTypeId: 'roadmap',
             mapTypeControl: false,
             streetViewControl: false,
+            fullscreenControl: false,  // Disable fullscreen button
+            zoomControl: false,        // Disable zoom controls
+
             styles: [
                 // General geometry (background) color
                 { elementType: 'geometry', stylers: [{ color: '#000000' }] },  // Dark gray background
