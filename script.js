@@ -46,7 +46,7 @@ function setDemographicMapStyle(option){
         console.log("In set demographicmapstyle, ward rank and associated color ", mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
         // console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
         rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option]))
-    
+
         // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
     }
     // console.log("in setDemographicMapStyle, rgba", rgbValues)

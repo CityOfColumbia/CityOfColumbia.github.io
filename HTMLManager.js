@@ -97,8 +97,14 @@ class HTMLManager {
             table.style.display = 'none';
         });
         // Show the selected table
-        document.getElementById(tableId).style.display = 'block';
+        if(document.getElementById(tableId)){
+        document.getElementById(tableId).style.display = 'block';}
+
         this.currentTableId = tableId;
+
+        if(this.currentTableId == "all-controls"){
+            safeSetDemographicStyle("Total Population")
+        }
     }
 
     changeMapKeyImage(tableId){

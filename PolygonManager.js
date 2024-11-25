@@ -336,13 +336,25 @@ export class DemographicPolygons extends PolygonManager {
             // Get the selected demographic category
             const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
             if (!selectedDemographic) {
-                return
+                return;
             }
-
+    
             const subCategoryName = selectedDemographic.id;
-            const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
+    
+            // Determine the subcategory to use
+            let selectedSubCategoryId = 'Total Population'; // Default to "Total Population" for "All"
+            if (subCategoryName !== 'all') {
+                const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
+                if (selectedSubCategory) {
+                    selectedSubCategoryId = selectedSubCategory.id;
+                } else {
+                    return; // Exit if no specific subcategory is selected and "All" is not chosen
+                }
+            }
+    
+            // Retrieve feature information
             const featureInfo = this.wardData[wards[featureName]] || {};
-            const demographicData = featureInfo[selectedSubCategory.id] || {};
+            const demographicData = featureInfo[selectedSubCategoryId] || {};
             const geometry = event.feature.getGeometry();
             const bounds = new google.maps.LatLngBounds();
             geometry.forEachLatLng((latlng) => {
@@ -351,6 +363,7 @@ export class DemographicPolygons extends PolygonManager {
     
             const center = bounds.getCenter();
     
+            // Construct content for the infobox
             let content = `
                 <title>Feature Info Table</title>
                 <style>
@@ -371,18 +384,17 @@ export class DemographicPolygons extends PolygonManager {
                 <caption style="font-weight: bold">${wards[featureName]}</caption>
                     <tbody>`;
     
-
-                content += `
-                        <tr>
-                            <td>${selectedSubCategory.id.toLocaleString()}</td>
-                            <td>${demographicData.toLocaleString()}</td>
-                        </tr>`;
-            
+            content += `
+                    <tr>
+                        <td>${selectedSubCategoryId.toLocaleString()}</td>
+                        <td>${demographicData.toLocaleString()}</td>
+                    </tr>`;
     
             content += `
                     </tbody>
                 </table>`;
     
+            // Create and open the InfoWindow
             this.infowindow = new google.maps.InfoWindow({
                 content: content,
                 position: center,
@@ -390,9 +402,9 @@ export class DemographicPolygons extends PolygonManager {
             });
             this.infowindow.open(this.mapManager.map);
         });
+    
         this.mapManager.eventListeners.addListener(infoBox);
     }
-    
 
     //this getColor function is depricated
 //     getColor(value, min, max) { 
