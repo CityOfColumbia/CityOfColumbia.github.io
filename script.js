@@ -20,7 +20,7 @@ window.initMap = async function () {
 window.safeSetDemographicStyle = safeSetDemographicStyle
 window.safeToggleAll = safeToggleAll
 window.safeToggleGroup = safeToggleGroup
-window.all_toggle = all_toggle
+window.demographic_toggle = safe_Set_Demographic_Page
 
 // Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
 function safeToggleGroup(group, id) {
@@ -70,12 +70,43 @@ function safeSetDemographicStyle(demographic) {
     }
 }
 
-
-
 function all_toggle(){
-    window.mapManager.htmlManager.showTable('all-controls')
-    window.mapManager.htmlManager.showTable('all-box')
+
+    document.querySelectorAll('.feature-table').forEach(table => {
+        if (table.style.display !== 'none') {
+            window.mapManager.htmlManager.setInputsFalse(table.querySelectorAll('input'));
+        }
+        table.style.display = 'none';
+    });
+        safeSetDemographicStyle("Total Population")
     window.mapManager.polygonManager.addAllToggleListeners()
+}
+
+function demographic_toggle(option){
+    // window.mapManager.htmlManager.hideTable(window.mapManager.htmlManager.currentTableId)
+    window.mapManager.htmlManager.showFeatureTable(option)
+
+}
+function safe_Set_Demographic_Page(option){
+    if (isMapInitialized){
+        
+        if(option == 'all'){
+            // window.mapManager.htmlManager.hideTable(window.mapManager.htmlManager.currentTableId)
+            all_toggle()
+        }
+
+        else{
+            document.querySelector('#table-title').textContent = "Data Table";
+            const tableBody = document.querySelector('#data-table tbody');
+            if (tableBody) {
+                tableBody.innerHTML = ''; // Removes all rows from the table body
+            }
+            window.mapManager.htmlManager.hideTable('data-container')
+            demographic_toggle(option)
+        }
+
+    }
+
 
 }
 

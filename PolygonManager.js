@@ -423,7 +423,7 @@ export class DemographicPolygons extends PolygonManager {
             // Update the title of the data container
             const tableTitle = document.querySelector('#table-title');
             if (tableTitle) {
-                tableTitle.textContent =  `${wards[featureName]}`;
+                tableTitle.textContent = `${wards[featureName]}`;
             }
     
             // Clear the data table before populating it
@@ -433,11 +433,15 @@ export class DemographicPolygons extends PolygonManager {
             for (const [category, value] of Object.entries(featureInfo)) {
                 this.mapManager.htmlManager.addRow(category, value);
             }
+    
+            // Show the data container table
+            window.mapManager.htmlManager.showFeatureTable('data-container');
         });
     
         // Add the listener to the map manager for cleanup
         this.mapManager.eventListeners.addListener(tableUpdateListener);
     }
+    
     
     
     

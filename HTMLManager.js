@@ -88,7 +88,7 @@ class HTMLManager {
             this.mapManager.addZoomOutListeners();
         } }
 
-    showTable(tableId) {
+    showFeatureTable(tableId) {
         // Hide all tables and set inputs to false if they were previously selected
         document.querySelectorAll('.feature-table').forEach(table => {
             if (table.style.display !== 'none') {
@@ -102,8 +102,34 @@ class HTMLManager {
 
         this.currentTableId = tableId;
 
-        if(this.currentTableId == "all-controls"){
-            safeSetDemographicStyle("Total Population")
+    }
+
+    showTable(tableId) {
+        // Get the table element by ID
+        const table = document.getElementById(tableId);
+        
+        if (table) {
+            // Show all child elements of the table by setting their visibility to visible
+            table.querySelectorAll('*').forEach(element => {
+                element.style.visibility = 'visible';
+            });
+            // Show the table itself
+            table.style.display = 'table'; // Ensures the table structure is preserved
+        } else {
+            console.warn(`Table with id "${tableId}" not found.`);
+        }
+    }
+    
+
+    hideTable(tableId) {
+        // Get the table element by ID
+        const table = document.getElementById(tableId);
+        
+        if (table) {
+
+            table.style.display = 'none';
+        } else {
+            console.warn(`Table with id "${tableId}" not found.`);
         }
     }
 

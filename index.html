@@ -64,10 +64,10 @@
         <table>
             <tr>
                 <td colspan="2">
-                    <input type="radio" id="race" name="demographic" onclick="mapManager.htmlManager.showTable('race-controls')"> Race
-                    <input type="radio" id="age" name="demographic" onclick="mapManager.htmlManager.showTable('age-controls')"> Age
-                    <input type="radio" id="sex" name="demographic" onclick="mapManager.htmlManager.showTable('sex-controls')"> Sex
-                    <input type="radio" id="all" name="demographic" onclick="all_toggle()"> All
+                    <input type="radio" id="race" name="demographic" onclick="demographic_toggle('race-controls')"> Race
+                    <input type="radio" id="age" name="demographic" onclick="demographic_toggle('age-controls')"> Age
+                    <input type="radio" id="sex" name="demographic" onclick="demographic_toggle('sex-controls')"> Sex
+                    <input type="radio" id="all" name="demographic" onclick="demographic_toggle('all')"> All
 
 
                 </td>
@@ -108,8 +108,8 @@
     </div>
 
 
-    <div id="data-container">
-        <h2 id="table-title">Data Table</h2> <!-- New title element -->
+    <div id="data-container" style="display: none;">
+        <h2 id="table-title" >Data Table</h2> <!-- New title element -->
         <table id="data-table">
             <thead>
                 <tr>
