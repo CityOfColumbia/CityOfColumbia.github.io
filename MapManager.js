@@ -66,7 +66,7 @@ class MapManager {
 
     createMapDefinitions() {
         return new google.maps.Map(document.getElementById('map'), {
-            zoom: 13.6,
+            zoom: 12.6,
             center: { lat: 38.947907, lng: -92.323575 },
             mapTypeId: 'roadmap',
             mapTypeControl: false,
