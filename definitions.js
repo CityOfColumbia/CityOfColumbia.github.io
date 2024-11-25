@@ -14,7 +14,14 @@ export const wards = {
 //     'Sex': ['rgba(76,31,25,.8)', 'rgba(110,44,37,.8)', 'rgba(158,60,53,.8)', 'rgba(194,77,72,.8)', 'rgba(212,128,126,.8)', 'rgba(226,176,167,.8)']
 // };
 
-export const RGBAValues = ['rgba(255, 230, 204, 1)', 'rgba(255, 178, 102, 1)','rgba(255, 153, 51, 1)','rgba(255, 127, 0, 1)','rgba(255, 77, 0, 1)','rgba(255, 0, 0, 1)']
+export const RGBAValues = [
+    'rgba(255, 0, 0, 1)',     
+    'rgba(255, 77, 0, 1)',     
+    'rgba(255, 127, 0, 1)',     
+    'rgba(255, 153, 51, 1)',     
+    'rgba(255, 178, 102, 1)',
+    'rgba(255, 230, 204, 1)'
+     ]
 
 export const DemographicHierarchy = {
     'Black': 'Race',
