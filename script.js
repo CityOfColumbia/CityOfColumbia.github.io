@@ -41,11 +41,15 @@ function safeToggleAll() {
 
 function setDemographicMapStyle(option){
 
-    
+    console.log("TEST TEST")
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
-        // console.log("In set demographicmapstyle, ward rank and associated color ", mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
-        // console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
+        console.log("TEST TEST")
+        console.log(window.mapManager.polygonManager)
+        console.log("In set demographicmapstyle, ward rank and associated color ", window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
+        console.log("TEST TEST")
+
+        console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
         rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option]))
 
         // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
@@ -63,14 +67,18 @@ function setDemographicMapStyle(option){
 
 
 function safeSetDemographicStyle(demographic) {
-    if (isMapInitialized) {
+    if (isMapInitialized || window.mapManager.polygonManager) {
         setDemographicMapStyle(demographic); // Assuming you have a function for setting demographic style
     } else {
         console.log('mapManager is not initialized yet.');
     }
 }
 
-function all_toggle(){
+export function all_toggle() {
+    if (!window.mapManager.polygonManager) {
+        console.warn("PolygonManager not initialized yet. Aborting all_toggle.");
+        return;
+    }
 
     document.querySelectorAll('.feature-table').forEach(table => {
         if (table.style.display !== 'none') {
@@ -78,8 +86,9 @@ function all_toggle(){
         }
         table.style.display = 'none';
     });
-        safeSetDemographicStyle("Total Population")
-    window.mapManager.polygonManager.addAllToggleListeners()
+
+    safeSetDemographicStyle("Total Population");
+    window.mapManager.polygonManager.addAllToggleListeners();
 }
 
 function demographic_toggle(option){
@@ -87,6 +96,7 @@ function demographic_toggle(option){
     window.mapManager.htmlManager.showFeatureTable(option)
 
 }
+
 function safe_Set_Demographic_Page(option){
     if (isMapInitialized){
         

@@ -65,6 +65,7 @@ class HTMLManager {
 
 
         if (featureType === 'Business') {
+            document.getElementById("data-container").style.display = "none"
             this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('business-controls').style.display = 'block';
@@ -75,15 +76,16 @@ class HTMLManager {
                 this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
         
             document.getElementById('demographic-controls').style.display = 'block';
-            
+
+
             // Set the "Race" radio button to checked
-            document.getElementById('race').checked = true;
+            document.getElementById('demo-all').checked = true;
             
             // Set the "race-controls" feature table to block display
-            document.getElementById('race-controls').style.display = 'block';
+            // document.getElementById('race-controls').style.display = 'block';
             
             // Set the "Black or African American" radio button under race-options to checked
-            document.getElementById('Black').checked = true;
+            // document.getElementById('Black').checked = true;
         
             this.mapManager.addZoomOutListeners();
         } }
