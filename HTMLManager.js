@@ -126,6 +126,44 @@ class HTMLManager {
             }
         });
     }
+
+    addRow(category, value) {
+        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
+        const newRow = document.createElement('tr'); // Create a new row
+    
+        // Format the value with commas if it's a number
+        const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
+    
+        newRow.innerHTML = `
+            <td>${category}</td>
+            <td>${formattedValue}</td>
+        `; // Add cells with category and value
+    
+        tableBody.appendChild(newRow); // Append the row to the table body
+    }
+    
+    
+    // Function to clear all rows in the table
+    clearTable() {
+        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
+        tableBody.innerHTML = ''; // Remove all rows
+    }
+    
+    
+    
+    
+    
+    // // Function to clear all rows in the table
+    // clearTable(tableId) {
+    //     const tableBody = document.querySelector(`#${tableId} tbody`);
+    //     if (!tableBody) {
+    //         console.error(`Table with ID '${tableId}' not found.`);
+    //         return;
+    //     }
+    
+    //     tableBody.innerHTML = ''; // Clear all rows
+    // }
+    
 }
 
 export default HTMLManager; 

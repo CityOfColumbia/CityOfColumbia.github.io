@@ -96,7 +96,7 @@ input[type="radio"]:checked + label, input[type="checkbox"]:checked + label {
     margin-top: 5px;
 }
 
-.race-option, td {
+.race-option {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -183,4 +183,61 @@ input[type="radio"]:checked + label {
 /* Small font size for the controls */
 label, td {
     font-size: 14px;
+}
+
+#test-table{
+    position: absolute;            /* Overlay on top of content */
+    top: 10%;                      /* Position slightly down from the top */
+    right: 2%;                     /* Position slightly inward from the right */
+    width: 40%;                    /* Take up 40% of the screen width */
+    padding: 16px;                 /* Add padding around the content */
+    background-color: rgba(249, 249, 249, 0.95); /* Semi-transparent background */
+
+    z-index: 1000;                 /* Ensure it stays above other elements */
+    overflow: auto; 
+}
+
+
+/* Main container for the data tables */
+/* Main container for the data table */
+/* Main container for the data table */
+#data-container {
+    position: absolute;            /* Overlay on top of content */
+    top: 10%;                      /* Position slightly down from the top */
+    right: 2%;                     /* Position slightly inward from the right */
+    width: 15%;                    /* Take up 40% of the screen width */
+    padding: 16px;                 /* Add padding around the content */
+    background-color: rgba(249, 249, 249, 0.95); /* Semi-transparent background */
+    border: 1px solid #ddd;        /* Subtle border around the container */
+    border-radius: 8px;            /* Rounded corners for aesthetics */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for depth */
+    z-index: 1000;                 /* Ensure it stays above other elements */
+    overflow: auto;                /* Allow scrolling if content overflows */
+}
+
+/* Styling for the data table */
+#data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#data-table td, #data-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#data-table td:first-child {
+    width: 70%; /* Adjust this percentage as needed for the category column */
+    word-wrap: break-word; /* Ensure long text wraps within the cell */
+}
+
+#data-table td:last-child {
+    width: 30%; /* Adjust this percentage as needed for the value column */
+    text-align: right; /* Align values to the right for better readability */
+}
+
+#data-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
 }

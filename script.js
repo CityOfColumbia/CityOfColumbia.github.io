@@ -8,11 +8,11 @@ let isMapInitialized = false;  // Flag to track map initialization
 window.initMap = async function () {
     console.log('initMap is loaded');
     window.mapManager = new MapManager();
-    window.htmlManager = new HTMLManager(window.mapManager);
+    // window.htmlManager = new HTMLManager(window.mapManager);
     window.mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business")
     const checkboxes = document.querySelectorAll('#business-controls input[type="checkbox"]');
     // Pass the selected checkboxes to the setInputsTrue method
-    window.htmlManager.setInputsTrue(checkboxes);
+    window.mapManager.htmlManager.setInputsTrue(checkboxes);
     // Set the flag to true once the map has been initialized
     isMapInitialized = true;
 };
@@ -20,6 +20,7 @@ window.initMap = async function () {
 window.safeSetDemographicStyle = safeSetDemographicStyle
 window.safeToggleAll = safeToggleAll
 window.safeToggleGroup = safeToggleGroup
+window.all_toggle = all_toggle
 
 // Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
 function safeToggleGroup(group, id) {
@@ -43,7 +44,7 @@ function setDemographicMapStyle(option){
     
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
-        console.log("In set demographicmapstyle, ward rank and associated color ", mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
+        // console.log("In set demographicmapstyle, ward rank and associated color ", mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
         // console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
         rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option]))
 
@@ -67,6 +68,15 @@ function safeSetDemographicStyle(demographic) {
     } else {
         console.log('mapManager is not initialized yet.');
     }
+}
+
+
+
+function all_toggle(){
+    window.mapManager.htmlManager.showTable('all-controls')
+    window.mapManager.htmlManager.showTable('all-box')
+    window.mapManager.polygonManager.addAllToggleListeners()
+
 }
 
 // Attach event listeners when the page loads, but only call the mapManager methods when it's ready

@@ -2,9 +2,10 @@
 import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
 
  export class PolygonManager {
-    constructor(mapManager, wardGeoJsonUrl, managerID) {
+    constructor(mapManager, wardGeoJsonUrl, managerID, htmlManager ) {
 
         this.mapManager = mapManager
+        this.htmlManager = htmlManager
         this.wardGeoJsonUrl = wardGeoJsonUrl;
         this.infowindow = null;
         this.infoboxes = [];
@@ -405,6 +406,42 @@ export class DemographicPolygons extends PolygonManager {
     
         this.mapManager.eventListeners.addListener(infoBox);
     }
+
+    addAllToggleListeners() {
+        const tableUpdateListener = this.mapManager.map.data.addListener('click', (event) => {
+            // Check if data is loaded
+            const featureName = event.feature.getProperty('Name');
+    
+            // Check if the feature's name is in the targetNames array
+            if (!(featureName in wards)) {
+                return; // Exit the function if the feature's name is not in the list
+            }
+    
+            // Retrieve feature information
+            const featureInfo = this.wardData[wards[featureName]] || {};
+    
+            // Update the title of the data container
+            const tableTitle = document.querySelector('#table-title');
+            if (tableTitle) {
+                tableTitle.textContent =  `${wards[featureName]}`;
+            }
+    
+            // Clear the data table before populating it
+            this.mapManager.htmlManager.clearTable();
+    
+            // Populate the data table with category and value pairs
+            for (const [category, value] of Object.entries(featureInfo)) {
+                this.mapManager.htmlManager.addRow(category, value);
+            }
+        });
+    
+        // Add the listener to the map manager for cleanup
+        this.mapManager.eventListeners.addListener(tableUpdateListener);
+    }
+    
+    
+    
+    
 
     //this getColor function is depricated
 //     getColor(value, min, max) { 
