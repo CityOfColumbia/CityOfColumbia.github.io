@@ -1,5 +1,6 @@
 //import BusinessPolygons from './PolygonManager.js'
 import {DemographicPolygons,BusinessPolygons,PolygonManager} from './PolygonManager.js'
+import HTMLManager from './HTMLManager.js'
 import BusinessMarkers from './Markers.js'
 import EventListenerManager from './EventListenerManager.js'
 
@@ -21,6 +22,7 @@ class MapManager {
         }
 
         this.map = this.createMapDefinitions();
+        this.htmlManager = new HTMLManager(this)
         this.eventListeners = null;
         this.polygonManager = null;
         this.markerManager = null;

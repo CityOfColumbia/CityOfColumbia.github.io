@@ -2,9 +2,10 @@
 import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
 
  export class PolygonManager {
-    constructor(mapManager, wardGeoJsonUrl, managerID) {
+    constructor(mapManager, wardGeoJsonUrl, managerID, htmlManager ) {
 
         this.mapManager = mapManager
+        this.htmlManager = htmlManager
         this.wardGeoJsonUrl = wardGeoJsonUrl;
         this.infowindow = null;
         this.infoboxes = [];
@@ -210,10 +211,9 @@ export class DemographicPolygons extends PolygonManager {
 
             this.wardRankings = wardRankings
             this.minMaxValues = minMaxValues;
-            this.setDemographicMapStyle('Black')
+            this.setDemographicMapStyle('Total Population')
             this.addInfoBoxes()
-            console.log("in demoPolygons, minMaxValues", this.minMaxValues)
-            console.log("in demopolygons, wardrankings", this.wardRankings)
+            this.addAllToggleListeners()
 
         });
     }
@@ -292,19 +292,16 @@ export class DemographicPolygons extends PolygonManager {
     }
     
     setDemographicMapStyle(option){
+        console.log("In polygon manager, option", option)
 
         let demographics = this.mapManager.polygonManager.wardData;
-        console.log("In SetdemographicMapStyle: demographics! ", demographics)
         let rgbValues = []
         for(let i = 0; i<= 5; i++){
-            console.log("In set demographicmapstyle TEST")
-            console.log("showing mapManager ward rankings", this.wardRankings["Ward " + (i + 1)] )
+            console.log("In polygon manager, ", this.wardRankings["Ward " + (i + 1)][option])
             rgbValues.push(this.getColor(this.wardRankings["Ward " + (i + 1)][option],option))
-            console.log("In set demographicmapstyle TEST")
         
             // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
         }
-        console.log("in setDemographicMapStyle, rgba", rgbValues)
         
         for (let i = 1; i <= 6; i++){
             let wardString = "Ward " + i;
@@ -405,6 +402,46 @@ export class DemographicPolygons extends PolygonManager {
     
         this.mapManager.eventListeners.addListener(infoBox);
     }
+
+    addAllToggleListeners() {
+        const tableUpdateListener = this.mapManager.map.data.addListener('click', (event) => {
+            // Check if data is loaded
+            const featureName = event.feature.getProperty('Name');
+    
+            // Check if the feature's name is in the targetNames array
+            if (!(featureName in wards)) {
+                return; // Exit the function if the feature's name is not in the list
+            }
+    
+            // Retrieve feature information
+            const featureInfo = this.wardData[wards[featureName]] || {};
+    
+            // Update the title of the data container
+            const tableTitle = document.querySelector('#table-title');
+            if (tableTitle) {
+                tableTitle.textContent = `${wards[featureName]}`;
+            }
+    
+            // Clear the data table before populating it
+            this.mapManager.htmlManager.clearTable();
+    
+            // Populate the data table with category and value pairs
+            for (const [category, value] of Object.entries(featureInfo)) {
+                this.mapManager.htmlManager.addRow(category, value);
+            }
+    
+            // Show the data container table
+            window.mapManager.htmlManager.showFeatureTable('data-container');
+        });
+    
+        // Add the listener to the map manager for cleanup
+        this.mapManager.eventListeners.addListener(tableUpdateListener);
+    }
+    
+    
+    
+    
+    
 
     //this getColor function is depricated
 //     getColor(value, min, max) { 

@@ -65,6 +65,7 @@ class HTMLManager {
 
 
         if (featureType === 'Business') {
+            document.getElementById("data-container").style.display = "none"
             this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('business-controls').style.display = 'block';
@@ -75,20 +76,21 @@ class HTMLManager {
                 this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
         
             document.getElementById('demographic-controls').style.display = 'block';
-            
+
+
             // Set the "Race" radio button to checked
-            document.getElementById('race').checked = true;
+            document.getElementById('demo-all').checked = true;
             
             // Set the "race-controls" feature table to block display
-            document.getElementById('race-controls').style.display = 'block';
+            // document.getElementById('race-controls').style.display = 'block';
             
             // Set the "Black or African American" radio button under race-options to checked
-            document.getElementById('Black').checked = true;
+            // document.getElementById('Black').checked = true;
         
             this.mapManager.addZoomOutListeners();
         } }
 
-    showTable(tableId) {
+    showFeatureTable(tableId) {
         // Hide all tables and set inputs to false if they were previously selected
         document.querySelectorAll('.feature-table').forEach(table => {
             if (table.style.display !== 'none') {
@@ -102,8 +104,34 @@ class HTMLManager {
 
         this.currentTableId = tableId;
 
-        if(this.currentTableId == "all-controls"){
-            safeSetDemographicStyle("Total Population")
+    }
+
+    showTable(tableId) {
+        // Get the table element by ID
+        const table = document.getElementById(tableId);
+        
+        if (table) {
+            // Show all child elements of the table by setting their visibility to visible
+            table.querySelectorAll('*').forEach(element => {
+                element.style.visibility = 'visible';
+            });
+            // Show the table itself
+            table.style.display = 'table'; // Ensures the table structure is preserved
+        } else {
+            console.warn(`Table with id "${tableId}" not found.`);
+        }
+    }
+    
+
+    hideTable(tableId) {
+        // Get the table element by ID
+        const table = document.getElementById(tableId);
+        
+        if (table) {
+
+            table.style.display = 'none';
+        } else {
+            console.warn(`Table with id "${tableId}" not found.`);
         }
     }
 
@@ -126,6 +154,44 @@ class HTMLManager {
             }
         });
     }
+
+    addRow(category, value) {
+        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
+        const newRow = document.createElement('tr'); // Create a new row
+    
+        // Format the value with commas if it's a number
+        const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
+    
+        newRow.innerHTML = `
+            <td>${category}</td>
+            <td>${formattedValue}</td>
+        `; // Add cells with category and value
+    
+        tableBody.appendChild(newRow); // Append the row to the table body
+    }
+    
+    
+    // Function to clear all rows in the table
+    clearTable() {
+        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
+        tableBody.innerHTML = ''; // Remove all rows
+    }
+    
+    
+    
+    
+    
+    // // Function to clear all rows in the table
+    // clearTable(tableId) {
+    //     const tableBody = document.querySelector(`#${tableId} tbody`);
+    //     if (!tableBody) {
+    //         console.error(`Table with ID '${tableId}' not found.`);
+    //         return;
+    //     }
+    
+    //     tableBody.innerHTML = ''; // Clear all rows
+    // }
+    
 }
 
 export default HTMLManager; 

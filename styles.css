@@ -96,7 +96,7 @@ input[type="radio"]:checked + label, input[type="checkbox"]:checked + label {
     margin-top: 5px;
 }
 
-.race-option, td {
+.race-option {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -129,7 +129,7 @@ input[type="radio"]:hover, input[type="checkbox"]:hover {
     display: block;
     position: fixed;
     top: 10px; /* Adjust the value as needed */
-    right: 10px; /* Adjust the value as needed */
+    right: 60px; /* Adjust the value as needed */
     width: 300px; /* Adjust the width as needed */
     height: 100px; /* Adjust the height as needed */
     background-color: rgba(0, 0, 0, 0.7); /* Darker background similar to feature-table */
@@ -183,4 +183,72 @@ input[type="radio"]:checked + label {
 /* Small font size for the controls */
 label, td {
     font-size: 14px;
+}
+
+#test-table{
+    position: absolute;            /* Overlay on top of content */
+    top: 10%;                      /* Position slightly down from the top */
+    right: 2%;                     /* Position slightly inward from the right */
+    width: 40%;                    /* Take up 40% of the screen width */
+    padding: 16px;                 /* Add padding around the content */
+    background-color: rgba(249, 249, 249, 0.95); /* Semi-transparent background */
+
+    z-index: 1000;                 /* Ensure it stays above other elements */
+    overflow: auto; 
+}
+
+
+/* Container for the data display */
+#data-container {
+    position: fixed;               /* Fixed position for consistency with .feature-table */
+    top: 15%;                      /* Position slightly down from the top */
+    right: 1%;                     /* Position slightly inward from the right */
+    width: 20%;                    /* Adjust width for better layout */
+    padding: 10px;                 /* Padding for content spacing */
+    background-color: rgba(0, 0, 0, 0.7); /* Match dark background style */
+    color: white;                  /* Text color for readability */
+    border-radius: 8px;            /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); /* Consistent shadow styling */
+    z-index: 1000;                 /* Ensure it overlays other content */
+    overflow: auto;                /* Enable scrolling for overflow content */
+    font-family: Arial, sans-serif; /* Match font style of legends */
+    border: none;                  /* Remove border to align with others */
+}
+
+#data-container #table-title {
+    text-align: center; /* Center the title text */
+    font-size: 1.2rem;  /* Adjust the font size for prominence */
+    margin-bottom: 10px; /* Add spacing between the title and the table */
+    font-weight: bold;   /* Make the title bold */
+}
+
+/* Styling for the data table inside the container */
+#data-table {
+    width: 100%;                   /* Table spans the full width of the container */
+    border-collapse: collapse;     /* Remove gaps between table cells */
+    margin-top: 10px;              /* Space between the table and the container's top content */
+}
+
+#data-table td, #data-table th {
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Light borders for visibility */
+    padding: 8px;                 /* Consistent padding for cells */
+    text-align: left;             /* Left-align text by default */
+    color: white;                 /* Ensure text color matches the dark background */
+    font-size: 0.9rem;            /* Slightly smaller font for table data */
+}
+
+#data-table td:first-child {
+    width: 70%;                   /* Adjust column widths for categories */
+    word-wrap: break-word;        /* Ensure long text wraps within the cell */
+}
+
+#data-table td:last-child {
+    width: 30%;                   /* Adjust column widths for values */
+    text-align: right;            /* Right-align values for neatness */
+}
+
+#data-table th {
+    background-color: rgba(255, 255, 255, 0.1); /* Slight contrast for header cells */
+    font-weight: bold;            /* Highlight headers */
+    text-align: center;           /* Center-align header text */
 }
