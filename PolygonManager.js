@@ -435,7 +435,7 @@ export class DemographicPolygons extends PolygonManager {
         });
     
         // Add the listener to the map manager for cleanup
-        this.mapManager.eventListeners.addListener(tableUpdateListener);
+        this.mapManager.eventListeners.addAllListener(tableUpdateListener);
     }
     
     
