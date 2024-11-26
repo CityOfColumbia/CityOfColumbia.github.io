@@ -95,24 +95,23 @@ class markersManager {
     }
 }
 
-class BusinessMarkers extends markersManager{
-    constructor(mapManager, latlong){
-        super(mapManager,latlong);
+class BusinessMarkers extends markersManager {
+    constructor(mapManager, latlong) {
+        super(mapManager, latlong);
     }
+
+    // Method to create markers from CSV data
     createMarkers(csvData) {
-
-
         const markerIcon = {
-            path: google.maps.SymbolPath.CIRCLE,  // Simple circle icon
-            fillColor: "#FFFFFF",  // Light color (white) to contrast with black background
-            fillOpacity: 1,  // Slight transparency to blend with the heatmap
-            strokeColor: "#FF5733",  // Border matching heatmap's orangish color
-            strokeWeight: 2,  // Thin border to reduce clutter
-            scale: 4,  // Small size for a subtle presence (adjust for visibility)
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: "#FFFFFF",
+            fillOpacity: 1,
+            strokeColor: "#FF5733",
+            strokeWeight: 4,
+            scale: 10,
         };
 
         csvData.forEach(row => {
-            //console.log(csvData)
             const lat = parseFloat(row.Latitude);
             const long = parseFloat(row.Longitude);
 
@@ -123,10 +122,9 @@ class BusinessMarkers extends markersManager{
                     icon: markerIcon
                 });
 
-                // Store the marker in the allMarkers array (don't add it to the map yet)
                 this.allMarkers.push({
                     marker: marker,
-                    name: row.LocAcctName,  // Use LocAcctName instead of Name
+                    name: row.LocAcctName,
                     lat: lat,
                     long: long,
                     address: row.Address,
@@ -134,138 +132,126 @@ class BusinessMarkers extends markersManager{
                     naicsCode: row.NaicsCode
                 });
             }
-            //console.log(this.allMarkers)
         });
-        //return allMarkers;
-    };
+    }
+
+    // Method to filter and show markers based on user search input
     searchMarkers() {
-        const searchTerm = document.getElementById("businessSearch").value.toLowerCase().trim().replace(/[^\w\s]/gi, '');  // Get the search term
+        const searchTerm = document.getElementById("businessSearch").value.toLowerCase().trim().replace(/[^\w\s]/gi, '');
+        const suggestionsContainer = document.getElementById("suggestionsContainer");
+
+        // Clear the dropdown before adding new suggestions
+        const dropdown = document.getElementById('dropdown');
+        dropdown.innerHTML = '';  // Clear any previous dropdown suggestions
+
         let filteredMarkers = [];
+    
         // Clear all previous markers from the map
         this.allMarkers.forEach(item => {
             item.marker.setMap(null);  // Remove marker from the map
         });
+    
         if (!searchTerm) {
-            console.log('Empty Search');  
-        } 
-        else {
-        // Filter the markers based on the search term (match business name starting with the search term)
+            console.log('Empty Search');
+        } else {
+            // Filter the markers based on the search term (match business name starting with the search term)
             filteredMarkers = this.allMarkers.filter(item => {
                 // Ensure item.name (LocAcctName) is a valid string before calling toLowerCase
-                //console.log(item)
                 if (item.name && typeof item.name === 'string') {
-                    const cleanedName = item.name.toLowerCase().replace(/[^\w\s]/gi, '');
+                    const cleanedName = item.name.toLowerCase().replace(/[^\w\s]/gi, ''); // Cleaned name
                     return cleanedName.includes(searchTerm);  // Check for a match using LocAcctName
                 }
-                return false;  // If item.name is invalid, exclude this marker
+                return false;  // If item.name is invalid (not a string), exclude this marker
             });
         }
-        console.log(filteredMarkers)
-        // Add the filtered markers to the map
+    
+        // Create a Set to track unique business-name-address combinations
+        const uniqueBusinesses = new Set();
+
+        // Display matching businesses in the dropdown (ensuring uniqueness by name and address)
         if (filteredMarkers.length > 0) {
+            dropdown.style.display = 'block';  // Show the dropdown if there are matching businesses
             filteredMarkers.forEach(item => {
-                //console.log(this)
-                item.marker.setMap(this.mapManager.map);  // Add marker to the map
+                const uniqueKey = `${item.name.toLowerCase().trim()}-${item.address.toLowerCase().trim()}`;  // Unique key combining name and address
 
-                // Optional: Add a click listener for the info window
-                const contentString = `
-                    <div>
-                        <h3>${item.name}</h3>
-                        <ul>
-                            <li>Address: ${item.address}</li>
-                            <li>Ward: ${item.ward}</li>
-                            ${item.naicsCode ? `<li>NAICS Code: ${item.naicsCode}</li>` : ''}
-                        </ul>
-                    </div>
-                `;
+                if (!uniqueBusinesses.has(uniqueKey)) {
+                    uniqueBusinesses.add(uniqueKey);  // Add unique combination to the Set
 
-                const infoWindow = new google.maps.InfoWindow({
-                    content: contentString
-                });
-
-                item.marker.addListener("click", () => {
-                    infoWindow.open(item.marker.getMap(), item.marker);
-                });
+                    const div = document.createElement('div');
+                    div.textContent = item.name +' | Address: ' + item.address;  // Show business name
+                    div.addEventListener('click', () => {
+                        document.getElementById("businessSearch").value = item.name;  // Set search input to selected business name
+                        this.showFilteredMarkers([item]);  // Show only the filtered marker for the selected business
+                        dropdown.style.display = 'none';  // Hide the dropdown after selection
+                    });
+                    dropdown.appendChild(div);
+                }
             });
+        } else {
+            dropdown.style.display = 'none';  // Hide the dropdown if no matches
         }
-    };
+    }
 
 
+    showFilteredMarkers(filteredMarkers) {
+        // Add the filtered markers to the map
+        filteredMarkers.forEach(item => {
+            item.marker.setMap(this.mapManager.map);  // Add marker to the map
+
+            // Optional: Add a click listener for the info window
+            const contentString = `
+                <div>
+                    <h3>${item.name}</h3>
+                    <ul>
+                        <li>Address: ${item.address}</li>
+                        <li>Ward: ${item.ward}</li>
+                        ${item.naicsCode ? `<li>NAICS Code: ${item.naicsCode}</li>` : ''}
+                    </ul>
+                </div>
+            `;
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            item.marker.addListener("click", () => {
+                infoWindow.open(item.marker.getMap(), item.marker);
+            });
+        });
+    }
 
     async placeOnLatLong(csvDataPromise) {
-        
         const csvData = await csvDataPromise;
-       //const infoWindow = new google.maps.InfoWindow();
 
-        // Variable to hold the markers for later use
-        //let allMarkers = [];
-        //this.createMarkers(csvData);
         document.getElementById("searchButton").addEventListener("click", () => {
-            
             this.searchMarkers();  // Call the search function when the user clicks "Search"
             this.createMarkers(csvData);
         });
-                
-        // Initially create all markers but don't add them to the map
-        //this.createMarkers(csvData);
 
-    }
-
-
-    
-
-    toggleGroup(key,group) {
-     
-        this.markerDataList.forEach(marker =>{
-
-            if(marker[key] == group){
-
-                if(marker['isVisible'] == true){
-
-                    marker['isVisible'] = !marker['isVisible']
-                    marker['Marker'].setMap(null)
-
-                }
-
-                else if(marker['isVisible'] == false){
-
-                    marker['isVisible'] = !marker['isVisible']
-                    marker['Marker'].setMap(this.mapManager.map)
-
-                }
-
-            }
-
-        })
-        
-    }
-
-    toggleAll() {
-        let toggle = document.getElementById("all").checked;
-        const featureTables = document.querySelectorAll('.parent-feature-table');
-    
-        featureTables.forEach(table => {
-            // Reset form elements
-            const inputs = table.querySelectorAll('input');
-            inputs.forEach(input => {
-
-            if (input.type === 'checkbox') {
-                    input.checked = toggle;
-                }
-            });
+        // Set up the input event listener for real-time search as the user types
+        document.getElementById("businessSearch").addEventListener("input", () => {
+            this.searchMarkers();  // Call the search function on each keystroke
         });
-    
-        this.markerDataList.forEach(marker => {
-            marker["isVisible"] = toggle;
-            marker["Marker"].setMap(toggle ? this.mapManager.map : null);
-        });
+
+        this.createMarkers(csvData); // Initially create markers
     }
-    
+
 
 
     showMarkers(){
         console.log(this.markerDataList)
     }
+
+
+debouncedSearch() {
+    clearTimeout(this.debounceTimeout);
+    this.debounceTimeout = setTimeout(() => {
+        this.searchMarkers();  // Call search after typing is complete
+    }, 300); // 300ms delay to avoid making too many requests while typing
 }
+
+
+}
+
 
 export default BusinessMarkers; 

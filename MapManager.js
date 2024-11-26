@@ -25,7 +25,7 @@ class MapManager {
         this.htmlManager = new HTMLManager(this)
         this.eventListeners = null;
         this.polygonManager = null;
-        this.markerManager = null;
+        this.businessMarkerManager = new BusinessMarkers(this);
         this.heatMapZooms = {   
             1:5,
             2:5,
@@ -68,7 +68,7 @@ class MapManager {
 
     createMapDefinitions() {
         return new google.maps.Map(document.getElementById('map'), {
-            zoom: 12.6,
+            zoom: 12,
             center: { lat: 38.947907, lng: -92.323575 },
             mapTypeId: 'roadmap',
             mapTypeControl: false,

@@ -253,7 +253,6 @@ label, td {
     text-align: center;           /* Center-align header text */
 }
 
-
 /* Search Bar styling */
 .search-container {
     position: absolute;
@@ -277,7 +276,7 @@ label, td {
     border: none;
     border-radius: 20px;
     margin-right: 10px;
-    width: 700px;
+    width: 500px; /* Adjusted width for better fit */
     box-sizing: border-box;
     background-color: rgba(19, 18, 18, 0.4); /* Slightly transparent black background */
 }
@@ -303,4 +302,54 @@ label, td {
 
 .search-container button:active {
     background-color: #cc5200;  /* Even darker orange when pressed */
+}
+
+/* Suggestions dropdown */
+.suggestions-container {
+    position: absolute;
+    top: 100%;  /* Position it below the input */
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: none; /* Initially hidden */
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+
+.dropdown {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(65, 65, 65, 0.8); /* Dark background */
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none; /* Hidden by default */
+}
+
+.dropdown div {
+    padding: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.dropdown div:hover {
+    background-color: #ff6600;
 }
