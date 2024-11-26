@@ -72,21 +72,12 @@ class HTMLManager {
         }
         
         if (featureType === 'Demographic') {
+            document.getElementById("business-controls").style.display = "none"
             if(!this.mapManager.polygonManager)
                 this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-        
             document.getElementById('demographic-controls').style.display = 'block';
-
-
             // Set the "Race" radio button to checked
-            document.getElementById('demo-all').checked = true;
-            
-            // Set the "race-controls" feature table to block display
-            // document.getElementById('race-controls').style.display = 'block';
-            
-            // Set the "Black or African American" radio button under race-options to checked
-            // document.getElementById('Black').checked = true;
-        
+            document.getElementById('demo-all').checked = true;        
             this.mapManager.addZoomOutListeners();
         } }
 

@@ -10,9 +10,9 @@ window.initMap = async function () {
     window.mapManager = new MapManager();
     // window.htmlManager = new HTMLManager(window.mapManager);
     window.mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business")
-    const checkboxes = document.querySelectorAll('#business-controls input[type="checkbox"]');
+    //const checkboxes = document.querySelectorAll('#business-controls input[type="checkbox"]');
     // Pass the selected checkboxes to the setInputsTrue method
-    window.mapManager.htmlManager.setInputsTrue(checkboxes);
+   // window.mapManager.htmlManager.setInputsTrue(checkboxes);
     // Set the flag to true once the map has been initialized
     isMapInitialized = true;
 };

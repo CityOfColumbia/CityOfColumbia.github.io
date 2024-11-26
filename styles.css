@@ -12,14 +12,6 @@ html, body {
     width: 100%;
 }
 
-#business-controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
-    color: white; /* White text on a dark background */
-}
 
 #feature-toggle {
     position: absolute;
@@ -30,12 +22,7 @@ html, body {
     color: white; /* White text on a dark background */
 }
 
-#business-controls, #feature-toggle {
-    background-color: rgba(117, 91, 91, 0.6);
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(247, 245, 245, 0.3);
-}
+
 
 input[type="radio"], input[type="checkbox"] {
     appearance: none;
