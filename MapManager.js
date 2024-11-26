@@ -154,13 +154,12 @@ class MapManager {
 
     }
 
-    placeHeatMap(){  //TODO: Change the heatmap layer to its own class. this should be possible, but this needed to be finished for presentation
-
+    placeHeatMap(inputHeatMap){  
         const heatmapData = [];
-    
-        this.markerManager.markerDataList.forEach(row => {
-            var lat = parseFloat(row["Lat"]);
-            var lng = parseFloat(row["Long"]);
+
+        inputHeatMap.forEach(row => {          
+            var lat = parseFloat(row["Latitude"]);
+            var lng = parseFloat(row["Longitude"]);
             if (!isNaN(lat) && !isNaN(lng)) {
                 var latLng = new google.maps.LatLng(lat, lng);
                 heatmapData.push(latLng);
@@ -222,9 +221,15 @@ class MapManager {
             this.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
     
             if(this.hasMarkerSet[mapID] == true){
+
                 this.createMarkerManager(markerData,mapID);
+                await this.markerManager.createMarkers(await this.markerManager.data);
+                this.placeHeatMap(await this.markerManager.data);
+                console.log('heatmap2');
+              
                 await this.markerManager.placeOnLatLong(this.markerManager.data);
-                this.placeHeatMap()
+
+                
             }
     
             this.addZoomOutListeners();

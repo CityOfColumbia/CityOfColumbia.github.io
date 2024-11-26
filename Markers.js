@@ -4,8 +4,8 @@ class markersManager {
     constructor(mapManager,latLong){
         this.mapManager = mapManager
         this.data = this.loadCSV(latLong);
-        this.markerDataList = []; //TODO: rename this list to something more intuitive, like markers
-
+        this.markerDataList = []; 
+        this.allMarkers = [];
     }
 
     async loadCSV(url){
@@ -99,73 +99,120 @@ class BusinessMarkers extends markersManager{
     constructor(mapManager, latlong){
         super(mapManager,latlong);
     }
+    createMarkers(csvData) {
 
-    async placeOnLatLong(csvDataPromise) {
-        const csvData = await csvDataPromise;
-        const infoWindow = new google.maps.InfoWindow();
+
         const markerIcon = {
             path: google.maps.SymbolPath.CIRCLE,  // Simple circle icon
             fillColor: "#FFFFFF",  // Light color (white) to contrast with black background
-            fillOpacity: 0.7,  // Slight transparency to blend with the heatmap
+            fillOpacity: 1,  // Slight transparency to blend with the heatmap
             strokeColor: "#FF5733",  // Border matching heatmap's orangish color
-            strokeWeight: 1,  // Thin border to reduce clutter
-            scale: 2,  // Small size for a subtle presence (adjust for visibility)
+            strokeWeight: 2,  // Thin border to reduce clutter
+            scale: 4,  // Small size for a subtle presence (adjust for visibility)
         };
 
         csvData.forEach(row => {
-            const keys = ["Marker","Name","Ward","Naics","Business Type","isVisible","Lat","Long"]
-            const values = []
+            //console.log(csvData)
             const lat = parseFloat(row.Latitude);
             const long = parseFloat(row.Longitude);
 
-            let numberPart;
-
-    
             if (!isNaN(lat) && !isNaN(long)) {
                 const marker = new google.maps.Marker({
                     position: { lat: lat, lng: long },
-                    map: this.mapManager.map,
-                    icon: markerIcon,
-                    title: typeof row.LocAcctName === 'string' ? row.LocAcctName : String(row.LocAcctName)
+                    title: typeof row.LocAcctName === 'string' ? row.LocAcctName : String(row.LocAcctName),
+                    icon: markerIcon
                 });
 
-                values.push(marker,row.LocAcctName, wards[row.Representative])
-
-                 if (row.NaicsCode) {
-                    numberPart= row.NaicsCode
-                    values.push(numberPart, null, true, lat, long)
-                } else {
-                    values.push(null,null, true, lat, long)
-
-                }
-
-                this.markerDataList.push(this.addMarkerData(keys,values));
-    
-                // Add click listener to each marker
-                marker.addListener("click", () => {
-                    const numberPart = row.NaicsCode ? row.NaicsCode : '';
-                    const category = row.NaicsCode ? NAICS_Categories[String(row.NaicsCode).substring(0, 2)] : 'N/A';
-                    const descriptionPart = row.descriptionPart ? row.descriptionPart : '';
-                
-                    const contentString = `
-                        <div>
-                            <h3>${row.LocAcctName}</h3>
-                            <ul>
-                                <li>Address: ${row.Address}</li>
-                                <li>Ward: ${wards[row.Representative]}</li>
-                                ${row.NaicsCode ? `<li>NAICS Code: ${numberPart}</li>` : ''}
-                                <li>Category: ${category}</li>
-                            </ul>
-                        </div>
-                    `;
-                
-                    infoWindow.close();
-                    infoWindow.setContent(contentString);
-                    infoWindow.open(marker.getMap(), marker);
+                // Store the marker in the allMarkers array (don't add it to the map yet)
+                this.allMarkers.push({
+                    marker: marker,
+                    name: row.LocAcctName,  // Use LocAcctName instead of Name
+                    lat: lat,
+                    long: long,
+                    address: row.Address,
+                    ward: wards[row.Representative],
+                    naicsCode: row.NaicsCode
                 });
             }
+            //console.log(this.allMarkers)
         });
+        //return allMarkers;
+    };
+    searchMarkers() {
+        const searchTerm = document.getElementById("businessSearch").value.toLowerCase().trim().replace(/[^\w\s]/gi, '');  // Get the search term
+        let filteredMarkers = [];
+        // Clear all previous markers from the map
+        this.allMarkers.forEach(item => {
+            item.marker.setMap(null);  // Remove marker from the map
+        });
+        if (!searchTerm) {
+            console.log('Empty Search');  
+        } 
+        else {
+        // Filter the markers based on the search term (match business name starting with the search term)
+            filteredMarkers = this.allMarkers.filter(item => {
+                // Ensure item.name (LocAcctName) is a valid string before calling toLowerCase
+                //console.log(item)
+                if (item.name && typeof item.name === 'string') {
+                    const cleanedName = item.name.toLowerCase().replace(/[^\w\s]/gi, '');
+                    return cleanedName.includes(searchTerm);  // Check for a match using LocAcctName
+                }
+                return false;  // If item.name is invalid, exclude this marker
+            });
+        }
+        console.log(filteredMarkers)
+        // Add the filtered markers to the map
+        if (filteredMarkers.length > 0) {
+            filteredMarkers.forEach(item => {
+                //console.log(this)
+                item.marker.setMap(this.mapManager.map);  // Add marker to the map
+
+                // Optional: Add a click listener for the info window
+                const contentString = `
+                    <div>
+                        <h3>${item.name}</h3>
+                        <ul>
+                            <li>Address: ${item.address}</li>
+                            <li>Ward: ${item.ward}</li>
+                            ${item.naicsCode ? `<li>NAICS Code: ${item.naicsCode}</li>` : ''}
+                        </ul>
+                    </div>
+                `;
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: contentString
+                });
+
+                item.marker.addListener("click", () => {
+                    infoWindow.open(item.marker.getMap(), item.marker);
+                });
+            });
+        }
+    };
+
+
+
+    async placeOnLatLong(csvDataPromise) {
+        
+        const csvData = await csvDataPromise;
+       //const infoWindow = new google.maps.InfoWindow();
+
+        // Variable to hold the markers for later use
+        //let allMarkers = [];
+        //this.createMarkers(csvData);
+        document.getElementById("searchButton").addEventListener("click", () => {
+            
+            this.searchMarkers();  // Call the search function when the user clicks "Search"
+            this.createMarkers(csvData);
+        });
+                
+        // Initially create all markers but don't add them to the map
+        //this.createMarkers(csvData);
+
     }
+
+
+    
 
     toggleGroup(key,group) {
      

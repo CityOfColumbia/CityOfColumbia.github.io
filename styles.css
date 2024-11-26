@@ -252,3 +252,55 @@ label, td {
     font-weight: bold;            /* Highlight headers */
     text-align: center;           /* Center-align header text */
 }
+
+
+/* Search Bar styling */
+.search-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(65, 65, 65, 0.6); /* Black with 60% opacity */
+    border-radius: 25px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px); /* Glossy blur effect */
+    z-index: 1000; /* Ensure it appears above the map */
+}
+
+.search-container input {
+    padding: 10px;
+    font-size: 16px;
+    color: #fff;  /* White text for the input */
+    border: none;
+    border-radius: 20px;
+    margin-right: 10px;
+    width: 700px;
+    box-sizing: border-box;
+    background-color: rgba(19, 18, 18, 0.4); /* Slightly transparent black background */
+}
+
+.search-container input::placeholder {
+    color: #e0dddd;  /* Light gray placeholder text */
+}
+
+.search-container button {
+    padding: 10px 16px;
+    font-size: 16px;
+    border: none;
+    background-color: #ff6600; /* Orange color for the button */
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-container button:hover {
+    background-color: #e65c00;  /* Darker orange on hover */
+}
+
+.search-container button:active {
+    background-color: #cc5200;  /* Even darker orange when pressed */
+}
