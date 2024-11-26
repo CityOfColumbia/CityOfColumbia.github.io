@@ -41,13 +41,12 @@ function safeToggleAll() {
 
 function setDemographicMapStyle(option){
 
-    console.log("TEST TEST")
+    
+    window.mapManager.htmlManager.changeText("map-legend-label", option)
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
-        console.log("TEST TEST")
         console.log(window.mapManager.polygonManager)
         console.log("In set demographicmapstyle, ward rank and associated color ", window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
-        console.log("TEST TEST")
 
         console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
         rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option]))
@@ -67,7 +66,7 @@ function setDemographicMapStyle(option){
 
 
 function safeSetDemographicStyle(demographic) {
-    if (isMapInitialized || window.mapManager.polygonManager) {
+    if (isMapInitialized) {
         setDemographicMapStyle(demographic); // Assuming you have a function for setting demographic style
     } else {
         console.log('mapManager is not initialized yet.');
@@ -106,6 +105,7 @@ function safe_Set_Demographic_Page(option){
         }
 
         else{
+            window.mapManager.eventListeners.cleanupAllListeners()
             document.querySelector('#table-title').textContent = "Data Table";
             const tableBody = document.querySelector('#data-table tbody');
             if (tableBody) {
