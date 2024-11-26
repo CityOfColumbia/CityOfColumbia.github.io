@@ -122,6 +122,16 @@ class HTMLManager {
         }
     }
     
+    changeText(id, text) {
+        console.log("test")
+        const element = document.getElementById(id);
+        if (element) { // Check if the element exists
+            element.textContent = text; // Change the text content of the element
+        } else {
+            console.error(`Element with id "${id}" not found.`);
+        }
+    }
+    
 
     hideTable(tableId) {
         // Get the table element by ID

@@ -42,7 +42,7 @@ function safeToggleAll() {
 function setDemographicMapStyle(option){
 
     
-
+    window.mapManager.htmlManager.changeText("map-legend-label", option)
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
         console.log(window.mapManager.polygonManager)
