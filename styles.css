@@ -276,7 +276,7 @@ label, td {
     border: none;
     border-radius: 20px;
     margin-right: 10px;
-    width: 500px; /* Adjusted width for better fit */
+    width: 600px; /* Adjusted width for better fit */
     box-sizing: border-box;
     background-color: rgba(19, 18, 18, 0.4); /* Slightly transparent black background */
 }
@@ -302,32 +302,6 @@ label, td {
 
 .search-container button:active {
     background-color: #cc5200;  /* Even darker orange when pressed */
-}
-
-/* Suggestions dropdown */
-.suggestions-container {
-    position: absolute;
-    top: 100%;  /* Position it below the input */
-    left: 0;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    display: none; /* Initially hidden */
-}
-
-.suggestion-item {
-    padding: 10px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.suggestion-item:hover {
-    background-color: #f0f0f0;
 }
 
 
