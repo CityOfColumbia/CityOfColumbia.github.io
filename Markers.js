@@ -82,12 +82,11 @@ class markersManager {
 
     cleanup(){
 
-        this.markerDataList.forEach(markerData => {
-            markerData["Marker"].setMap(null);
-
+        this.allMarkers.forEach(item => {
+            item.marker.setMap(null);  // Remove marker from the map
         });
-
-        this.markerDataList = []
+    
+        this.allMarkers = []
     }
 
     testfunc(){

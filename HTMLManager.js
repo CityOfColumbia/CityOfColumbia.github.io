@@ -73,14 +73,15 @@ class HTMLManager {
         }
 
         if (featureType === 'Demographic') {
+            this.mapManager.cleanup();
+            this.mapManager.businessMarkerManager.cleanup();
             // Remove all Business markers when Demographic is selected
             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);
 
             //this.mapManager.businessMarkerManager.data = null;
             //this.mapManager.businessMarkerManager.placeOnLatLong(this.mapManager.businessMarkerManager.data);
             //this.mapManager.businessMarkerManager.createMarkers(this.mapManager.businessMarkerManager.data);
-            this.mapManager.cleanup();
-            this.mapManager.businessMarkerManager.searchMarkers();
+
             
             // Hide the business controls and show the demographic controls
             document.getElementById('business-controls').style.display = 'none';
