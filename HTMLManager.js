@@ -68,6 +68,7 @@ class HTMLManager {
         if (featureType === 'Business') {
             //this.hideTable();
             document.getElementById('business-controls').style.display = 'block';
+            //Removing data on switching maps
             this.mapManager.eventListeners.cleanupAllListeners()
             // Create the Business map
             this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
@@ -77,9 +78,9 @@ class HTMLManager {
 
         if (featureType === 'Demographic') {
             this.mapManager.cleanup();
-            this.mapManager.businessMarkerManager.cleanup();
             // Remove all Business markers when Demographic is selected
-            console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);            
+            this.mapManager.businessMarkerManager.cleanup();
+             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);            
             // Hide the business controls and show the demographic controls
             document.getElementById('business-controls').style.display = 'none';
 

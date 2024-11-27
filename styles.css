@@ -15,7 +15,7 @@ html, body {
 
 #feature-toggle {
     position: absolute;
-    bottom: 10px;
+    bottom: 35px;
     left: 10px;
     z-index: 1000;
     font-family: Arial, sans-serif;
