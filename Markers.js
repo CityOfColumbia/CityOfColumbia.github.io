@@ -102,12 +102,14 @@ class BusinessMarkers extends markersManager {
     // Method to create markers from CSV data
     createMarkers(csvData) {
         const markerIcon = {
-            path: google.maps.SymbolPath.CIRCLE,
+            path: "M 0,0 m -10,0 a 10,10 0 1,1 20,0 a 10,10 0 1,1 -20,0 M 0,0 l 0,30 z", // Pin shape
             fillColor: "#FFFFFF",
             fillOpacity: 1,
-            strokeColor: "#FF5733",
+            strokeColor: "#0033A0",
             strokeWeight: 4,
-            scale: 10,
+            scale: 1, // Scaling factor for the SVG
+            rotation: 350,
+            anchor: new google.maps.Point(0, 0) // Adjust anchor to ensure proper placement
         };
 
         csvData.forEach(row => {
