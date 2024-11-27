@@ -66,23 +66,19 @@ class HTMLManager {
         this.mapManager.cleanup();
 
         if (featureType === 'Business') {
+            //this.hideTable();
             document.getElementById('business-controls').style.display = 'block';
             // Create the Business map
             this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
+            document.getElementById('data-container').style.display = 'none';
         }
 
         if (featureType === 'Demographic') {
             this.mapManager.cleanup();
             this.mapManager.businessMarkerManager.cleanup();
             // Remove all Business markers when Demographic is selected
-            console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);
-
-            //this.mapManager.businessMarkerManager.data = null;
-            //this.mapManager.businessMarkerManager.placeOnLatLong(this.mapManager.businessMarkerManager.data);
-            //this.mapManager.businessMarkerManager.createMarkers(this.mapManager.businessMarkerManager.data);
-
-            
+            console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);            
             // Hide the business controls and show the demographic controls
             document.getElementById('business-controls').style.display = 'none';
 
@@ -92,11 +88,13 @@ class HTMLManager {
 
             document.getElementById('demographic-controls').style.display = 'block';
 
-            // Set the "Race" radio button to checked
+            // Set the "ALL" radio button to checked
             document.getElementById('demo-all').checked = true;
 
             // Add any necessary listeners for zoom or other actions
             this.mapManager.addZoomOutListeners();
+            // Remove the All info table 
+            document.getElementById('data-container').style.display = 'none';
         }
     }
 
