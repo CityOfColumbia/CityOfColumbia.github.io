@@ -1,14 +1,14 @@
 import { ImageSources } from './definitions.js';
 
 class HTMLManager {
-  
+
     constructor(mapManager) { 
         this.constructed = true;
         this.currentTableId = null;
-        this.mapManager = mapManager
+        this.mapManager = mapManager;
     }
 
-    showFeatures(featureType){
+    showFeatures(featureType) {
         const featureTables = document.querySelectorAll('.parent-feature-table');
 
         featureTables.forEach(table => {
@@ -16,24 +16,21 @@ class HTMLManager {
             // Reset form elements
             const inputs = table.querySelectorAll('input');
             inputs.forEach(input => {
-                if (input.type === 'radio' ) {
+                if (input.type === 'radio') {
                     input.checked = false;
                 } else if (input.type === 'checkbox') {
-    
-                    input.checked = true
-    
-    
+                    input.checked = true;
                 }
             });
-    
+
             const selects = table.querySelectorAll('select');
             selects.forEach(select => {
                 select.selectedIndex = 0;
             });
         });
-    
+
         const featureTables2 = document.querySelectorAll('.feature-table');
-    
+
         featureTables2.forEach(table => {
             table.style.display = 'none';
             // Reset form elements
@@ -45,12 +42,12 @@ class HTMLManager {
                     input.value = '';
                 }
             });
-    
+
             const selects = table.querySelectorAll('select');
             selects.forEach(select => {
                 select.selectedIndex = 0;
             });
-    
+
             // Check all options except "All" for non-radio tables
             const checkboxes = table.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
@@ -59,88 +56,101 @@ class HTMLManager {
                 }
             });
         });
-        if(this.mapManager.polygonManager.infowindow != null){
-        this.mapManager.polygonManager.infowindow.close()}
-        this.mapManager.cleanup()
 
+        // Close any open info windows
+        if (this.mapManager.polygonManager.infowindow != null) {
+            this.mapManager.polygonManager.infowindow.close();
+        }
+
+        // Clean up the map (clear markers, layers, etc.)
+        this.mapManager.cleanup();
 
         if (featureType === 'Business') {
-            document.getElementById("data-container").style.display = "none"
-            this.mapManager.createMap('WardOutlines.geojson','data.csv','addresses_with_wards_NEW.csv','Business');
-            this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('business-controls').style.display = 'block';
+            // Create the Business map
+            this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
+            this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         }
-        
-        if (featureType === 'Demographic') {
-            document.getElementById("business-controls").style.display = "none"
-            if(!this.mapManager.polygonManager)
-                this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
-            document.getElementById('demographic-controls').style.display = 'block';
-            // Set the "Race" radio button to checked
-            document.getElementById('demo-all').checked = true;        
-            this.mapManager.addZoomOutListeners();
-        } }
 
+        if (featureType === 'Demographic') {
+            // Remove all Business markers when Demographic is selected
+            console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);
+
+            //this.mapManager.businessMarkerManager.data = null;
+            //this.mapManager.businessMarkerManager.placeOnLatLong(this.mapManager.businessMarkerManager.data);
+            //this.mapManager.businessMarkerManager.createMarkers(this.mapManager.businessMarkerManager.data);
+            this.mapManager.cleanup();
+            this.mapManager.businessMarkerManager.searchMarkers();
+            
+            // Hide the business controls and show the demographic controls
+            document.getElementById('business-controls').style.display = 'none';
+
+            if (!this.mapManager.polygonManager) {
+                this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
+            }
+
+            document.getElementById('demographic-controls').style.display = 'block';
+
+            // Set the "Race" radio button to checked
+            document.getElementById('demo-all').checked = true;
+
+            // Add any necessary listeners for zoom or other actions
+            this.mapManager.addZoomOutListeners();
+        }
+    }
+
+    // Rest of the methods...
+    
     showFeatureTable(tableId) {
-        // Hide all tables and set inputs to false if they were previously selected
         document.querySelectorAll('.feature-table').forEach(table => {
             if (table.style.display !== 'none') {
                 this.setInputsFalse(table.querySelectorAll('input'));
             }
             table.style.display = 'none';
         });
-        // Show the selected table
-        if(document.getElementById(tableId)){
-        document.getElementById(tableId).style.display = 'block';}
+
+        if (document.getElementById(tableId)) {
+            document.getElementById(tableId).style.display = 'block';
+        }
 
         this.currentTableId = tableId;
-
     }
 
     showTable(tableId) {
-        // Get the table element by ID
         const table = document.getElementById(tableId);
-        
         if (table) {
-            // Show all child elements of the table by setting their visibility to visible
             table.querySelectorAll('*').forEach(element => {
                 element.style.visibility = 'visible';
             });
-            // Show the table itself
-            table.style.display = 'table'; // Ensures the table structure is preserved
+            table.style.display = 'table';
         } else {
             console.warn(`Table with id "${tableId}" not found.`);
         }
     }
-    
+
     changeText(id, text) {
-        console.log("test")
         const element = document.getElementById(id);
-        if (element) { // Check if the element exists
-            element.textContent = text; // Change the text content of the element
+        if (element) {
+            element.textContent = text;
         } else {
             console.error(`Element with id "${id}" not found.`);
         }
     }
-    
 
     hideTable(tableId) {
-        // Get the table element by ID
         const table = document.getElementById(tableId);
-        
         if (table) {
-
             table.style.display = 'none';
         } else {
             console.warn(`Table with id "${tableId}" not found.`);
         }
     }
 
-    changeMapKeyImage(tableId){
-        document.getElementById('map-image').src = ImageSources[tableId]
+    changeMapKeyImage(tableId) {
+        document.getElementById('map-image').src = ImageSources[tableId];
     }
 
-    setInputsFalse(inputs){
+    setInputsFalse(inputs) {
         inputs.forEach(input => {
             if (input.type === 'radio' || input.type === 'checkbox') {
                 input.checked = false;
@@ -148,7 +158,7 @@ class HTMLManager {
         });
     }
 
-    setInputsTrue(inputs){
+    setInputsTrue(inputs) {
         inputs.forEach(input => {
             if (input.type === 'radio' || input.type === 'checkbox') {
                 input.checked = true;
@@ -157,42 +167,20 @@ class HTMLManager {
     }
 
     addRow(category, value) {
-        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
-        const newRow = document.createElement('tr'); // Create a new row
-    
-        // Format the value with commas if it's a number
+        const tableBody = document.querySelector('#data-table tbody');
+        const newRow = document.createElement('tr');
         const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
-    
         newRow.innerHTML = `
             <td>${category}</td>
             <td>${formattedValue}</td>
-        `; // Add cells with category and value
-    
-        tableBody.appendChild(newRow); // Append the row to the table body
+        `;
+        tableBody.appendChild(newRow);
     }
-    
-    
-    // Function to clear all rows in the table
+
     clearTable() {
-        const tableBody = document.querySelector('#data-table tbody'); // Select the table body
-        tableBody.innerHTML = ''; // Remove all rows
+        const tableBody = document.querySelector('#data-table tbody');
+        tableBody.innerHTML = '';
     }
-    
-    
-    
-    
-    
-    // // Function to clear all rows in the table
-    // clearTable(tableId) {
-    //     const tableBody = document.querySelector(`#${tableId} tbody`);
-    //     if (!tableBody) {
-    //         console.error(`Table with ID '${tableId}' not found.`);
-    //         return;
-    //     }
-    
-    //     tableBody.innerHTML = ''; // Clear all rows
-    // }
-    
 }
 
-export default HTMLManager; 
+export default HTMLManager;

@@ -222,12 +222,13 @@ class MapManager {
     
             if(this.hasMarkerSet[mapID] == true){
 
-                this.createMarkerManager(markerData,mapID);
+                await this.createMarkerManager(markerData,mapID);
                 await this.markerManager.createMarkers(await this.markerManager.data);
                 this.placeHeatMap(await this.markerManager.data);
-                console.log('heatmap2');
+                console.log('heatmap created');
               
                 await this.markerManager.placeOnLatLong(this.markerManager.data);
+                console.log('markers generated');
 
                 
             }

@@ -138,7 +138,6 @@ class BusinessMarkers extends markersManager {
     // Method to filter and show markers based on user search input
     searchMarkers() {
         const searchTerm = document.getElementById("businessSearch").value.toLowerCase().trim().replace(/[^\w\s]/gi, '');
-        const suggestionsContainer = document.getElementById("suggestionsContainer");
 
         // Clear the dropdown before adding new suggestions
         const dropdown = document.getElementById('dropdown');
@@ -224,7 +223,7 @@ class BusinessMarkers extends markersManager {
         const csvData = await csvDataPromise;
 
         document.getElementById("searchButton").addEventListener("click", () => {
-            this.searchMarkers();  // Call the search function when the user clicks "Search"
+            //this.searchMarkers();  // Call the search function when the user clicks "Search"
             this.createMarkers(csvData);
         });
 

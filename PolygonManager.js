@@ -211,7 +211,7 @@ export class DemographicPolygons extends PolygonManager {
 
             this.wardRankings = wardRankings
             this.minMaxValues = minMaxValues;
-            this.setDemographicMapStyle('Total Population')
+            //this.setDemographicMapStyle('Total Population')
             this.addInfoBoxes()
             this.addAllToggleListeners()
 
@@ -291,7 +291,7 @@ export class DemographicPolygons extends PolygonManager {
         }
     }
     
-    setDemographicMapStyle(option){
+/*     setDemographicMapStyle(option){
         console.log("In polygon manager, option", option)
 
         let demographics = this.mapManager.polygonManager.wardData;
@@ -314,7 +314,7 @@ export class DemographicPolygons extends PolygonManager {
 
     getWardData(){
         return this.wardData
-    }
+    } */
 
     addInfoBoxes() {
         const infoBox = this.mapManager.map.data.addListener('click', (event) => {
