@@ -68,6 +68,7 @@ class HTMLManager {
         if (featureType === 'Business') {
             //this.hideTable();
             document.getElementById('business-controls').style.display = 'block';
+            this.mapManager.eventListeners.cleanupAllListeners()
             // Create the Business map
             this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);

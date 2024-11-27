@@ -27,6 +27,7 @@ class EventListenerManager {
     }
 
     cleanup() {
+        this.cleanupAllListeners()
         this.eventListeners.forEach(listener => {
             google.maps.event.removeListener(listener);
         });
