@@ -80,15 +80,17 @@ class HTMLManager {
             this.mapManager.cleanup();
             // Remove all Business markers when Demographic is selected
             this.mapManager.businessMarkerManager.cleanup();
-             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);            
+             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);    
+             //Clear search bar text on swithcing to demographics
+             document.getElementById("businessSearch").value = ''        
             // Hide the business controls and show the demographic controls
             document.getElementById('business-controls').style.display = 'none';
-
+            document.getElementById('demographic-controls').style.display = 'block';
             if (!this.mapManager.polygonManager) {
                 this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
             }
 
-            document.getElementById('demographic-controls').style.display = 'block';
+            
 
             // Set the "ALL" radio button to checked
             document.getElementById('demo-all').checked = true;
