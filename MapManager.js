@@ -125,8 +125,15 @@ class MapManager {
         });
     }
     
+    closeAllInfoBoxes() {
+        console.log("in closeallinfoboxes")
+        console.log(this.polygonManager.infoboxes)
 
-
+            this.polygonManager.infoboxes.forEach(function(infobox) {
+                infobox.close();
+            });
+        }
+    
     addZoomOutListeners() {
         // Add a hover listener to change the cursor
         // Listener to ensure polygons and markers turn off once the user zooms out far enough

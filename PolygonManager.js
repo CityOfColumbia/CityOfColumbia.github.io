@@ -316,92 +316,114 @@ export class DemographicPolygons extends PolygonManager {
         return this.wardData
     } */
 
-    addInfoBoxes() {
-        const infoBox = this.mapManager.map.data.addListener('click', (event) => {
-            // Check if data is loaded
-            const featureName = event.feature.getProperty('Name');
-    
-            // Check if the feature's name is in the targetNames array
-            if (!(featureName in wards)) {
-                return; // Exit the function if the feature's name is not in the list
-            }
-    
-            if (this.infowindow) {
-                this.infowindow.close();
-            }
-    
-            // Get the selected demographic category
-            const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
-            if (!selectedDemographic) {
-                return;
-            }
-    
-            const subCategoryName = selectedDemographic.id;
-    
-            // Determine the subcategory to use
-            let selectedSubCategoryId = 'Total Population'; // Default to "Total Population" for "All"
-            if (subCategoryName !== 'all') {
-                const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
-                if (selectedSubCategory) {
-                    selectedSubCategoryId = selectedSubCategory.id;
-                } else {
-                    return; // Exit if no specific subcategory is selected and "All" is not chosen
+        addInfoBoxes() {
+            const infoBox = this.mapManager.map.data.addListener('click', (event) => {
+                // Check if data is loaded
+                const featureName = event.feature.getProperty('Name');
+        
+                // Check if the feature's name is in the targetNames array
+                if (!(featureName in wards)) {
+                    return; // Exit the function if the feature's name is not in the list
                 }
-            }
+        
+                if (this.infowindow) {
+                    this.infowindow.close();
+                }
+        
+                // Get the selected demographic category
+                const selectedDemographic = document.querySelector('input[name="demographic"]:checked');
+                if (!selectedDemographic) {
+                    return;
+                }
+        
+                const subCategoryName = selectedDemographic.id;
+        
+                // Determine the subcategory to use
+                let selectedSubCategoryId = 'Total Population'; // Default to "Total Population" for "All"
+                if (subCategoryName !== 'all') {
+                    const selectedSubCategory = document.querySelector(`input[name="${subCategoryName}"]:checked`);
+                    if (selectedSubCategory) {
+                        selectedSubCategoryId = selectedSubCategory.id;
+                    } else {
+                        return; // Exit if no specific subcategory is selected and "All" is not chosen
+                    }
+                }
+        
+                // Retrieve feature information
+                const featureInfo = this.wardData[wards[featureName]] || {};
+                const demographicData = featureInfo[selectedSubCategoryId] || {};
+                const geometry = event.feature.getGeometry();
+                const bounds = new google.maps.LatLngBounds();
+                geometry.forEachLatLng((latlng) => {
+                    bounds.extend(latlng);
+                });
+        
+                const center = bounds.getCenter();
+        
+                // Construct content for the infobox
+                let content = `
+                    <title>Feature Info Table</title>
+                    <style>
+                        #infoTable {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        #infoTable th, #infoTable td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                        }
+                        #infoTable th {
+                            background-color: #f2f2f2;
+                            text-align: left;
+                        }
+                    </style>
+                    <table id="infoTable">
+                    <caption style="font-weight: bold">${wards[featureName]}</caption>
+                        <tbody>`;
+        
+                content += `
+                        <tr>
+                            <td>${selectedSubCategoryId.toLocaleString()}</td>
+                            <td>${demographicData.toLocaleString()}</td>
+                        </tr>`;
+        
+                content += `
+                        </tbody>
+                    </table>`;
+        
+                // Create and open the InfoWindow
+                this.infowindow = new google.maps.InfoWindow({
+                    content: content,
+                    position: center,
+                    disableAutoPan: true
+                });
+                this.infowindow.open(this.mapManager.map);
+            });
+        
+            this.mapManager.eventListeners.addListener(infoBox);
     
-            // Retrieve feature information
-            const featureInfo = this.wardData[wards[featureName]] || {};
-            const demographicData = featureInfo[selectedSubCategoryId] || {};
-            const geometry = event.feature.getGeometry();
-            const bounds = new google.maps.LatLngBounds();
-            geometry.forEachLatLng((latlng) => {
-                bounds.extend(latlng);
+            // Add event listeners to elements with the name "demographic" to close the infobox
+            const demographicElements = document.getElementsByName('demographic');
+            demographicElements.forEach(element => {
+                element.addEventListener('click', () => {
+                    if (this.infowindow) {
+                        this.infowindow.close();
+                    }
+                });
             });
     
-            const center = bounds.getCenter();
-    
-            // Construct content for the infobox
-            let content = `
-                <title>Feature Info Table</title>
-                <style>
-                    #infoTable {
-                        width: 100%;
-                        border-collapse: collapse;
+            // Add event listeners to elements with the name "race" to close the infobox
+            const raceElements = document.getElementsByName('race');
+            raceElements.forEach(element => {
+                element.addEventListener('click', () => {
+                    if (this.infowindow) {
+                        this.infowindow.close();
                     }
-                    #infoTable th, #infoTable td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                    }
-                    #infoTable th {
-                        background-color: #f2f2f2;
-                        text-align: left;
-                    }
-                </style>
-                <table id="infoTable">
-                <caption style="font-weight: bold">${wards[featureName]}</caption>
-                    <tbody>`;
-    
-            content += `
-                    <tr>
-                        <td>${selectedSubCategoryId.toLocaleString()}</td>
-                        <td>${demographicData.toLocaleString()}</td>
-                    </tr>`;
-    
-            content += `
-                    </tbody>
-                </table>`;
-    
-            // Create and open the InfoWindow
-            this.infowindow = new google.maps.InfoWindow({
-                content: content,
-                position: center,
-                disableAutoPan: true
+                });
             });
-            this.infowindow.open(this.mapManager.map);
-        });
+        }
     
-        this.mapManager.eventListeners.addListener(infoBox);
-    }
+    
 
     addAllToggleListeners() {
         const tableUpdateListener = this.mapManager.map.data.addListener('click', (event) => {
