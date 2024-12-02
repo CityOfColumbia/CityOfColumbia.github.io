@@ -96,30 +96,27 @@ function demographic_toggle(option){
 
 }
 
-function safe_Set_Demographic_Page(option){
-    if (isMapInitialized){
+function safe_Set_Demographic_Page(option) {
+    if (isMapInitialized) {
         
-        if(option == 'all'){
+        // Close all open infoboxes
+        window.mapManager.closeAllInfoBoxes();
+        
+        if (option == 'all') {
             // window.mapManager.htmlManager.hideTable(window.mapManager.htmlManager.currentTableId)
-            all_toggle()
-        }
-
-        else{
-            window.mapManager.eventListeners.cleanupAllListeners()
+            all_toggle();
+        } else {
+            window.mapManager.eventListeners.cleanupAllListeners();
             document.querySelector('#table-title').textContent = "Data Table";
             const tableBody = document.querySelector('#data-table tbody');
             if (tableBody) {
                 tableBody.innerHTML = ''; // Removes all rows from the table body
             }
-            window.mapManager.htmlManager.hideTable('data-container')
-            demographic_toggle(option)
+            window.mapManager.htmlManager.hideTable('data-container');
+            demographic_toggle(option);
         }
-
     }
-
-
 }
-
 // Attach event listeners when the page loads, but only call the mapManager methods when it's ready
 // document.addEventListener('DOMContentLoaded', function() {
 //     const wardCheckboxes = document.querySelectorAll('[id^="Ward"]');
