@@ -29,6 +29,9 @@
 
     <!-- Feature Toggle -->
     <div id="feature-toggle">
+        <div id="instructions" style="margin: 10px; font-family: Arial, sans-serif; font-size: 14px;">
+            <strong>Select Map Type:</strong> 
+          </div>
         <label><input type="radio" name="feature" value="Demographic" onclick="mapManager.htmlManager.showFeatures('Demographic')"> Demographics</label><br>
         <label><input type="radio" name="feature" value="Business" onclick="mapManager.htmlManager.showFeatures('Business')" checked> Business</label>
     </div>
@@ -67,7 +70,7 @@
             </tr>
             <tr id="race-controls" class="feature-table" style="display: none;">
                 <td colspan="2">
-                    <div class="race-options">
+                    <div class="race-options" style="display: flex; flex-direction: column; gap: 10px;">
                         <div class="race-option">
                             <input type="radio" id="Black" name="race" onclick="safeSetDemographicStyle('Black')"> Black or African American
                         </div>
