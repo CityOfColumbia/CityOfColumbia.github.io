@@ -402,26 +402,25 @@ export class DemographicPolygons extends PolygonManager {
         
             this.mapManager.eventListeners.addListener(infoBox);
     
-            // Add event listeners to elements with the name "demographic" to close the infobox
-            const demographicElements = document.getElementsByName('demographic');
-            demographicElements.forEach(element => {
-                element.addEventListener('click', () => {
-                    if (this.infowindow) {
-                        this.infowindow.close();
-                    }
+            // Function to add event listeners to elements by name
+            const addCloseListeners = (name) => {
+                const elements = document.getElementsByName(name);
+                elements.forEach(element => {
+                    element.addEventListener('click', () => {
+                        if (this.infowindow) {
+                            this.infowindow.close();
+                        }
+                    });
                 });
-            });
+            };
     
-            // Add event listeners to elements with the name "race" to close the infobox
-            const raceElements = document.getElementsByName('race');
-            raceElements.forEach(element => {
-                element.addEventListener('click', () => {
-                    if (this.infowindow) {
-                        this.infowindow.close();
-                    }
-                });
-            });
+            // Add event listeners to elements with the names "demographic", "race", "sex", and "age"
+            addCloseListeners('demographic');
+            addCloseListeners('race');
+            addCloseListeners('sex');
+            addCloseListeners('age');
         }
+    
     
     
 
