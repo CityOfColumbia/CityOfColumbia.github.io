@@ -56,7 +56,7 @@ class MapManager {
         this.eventListeners = new EventListenerManager(this)
     }
 
-    createPolygonManager(geoJson, data, managerID){
+    async createPolygonManager(geoJson, data, managerID){
         const returnPolygonManager = this.polygonManagerTypes[managerID];
         this.polygonManager = new returnPolygonManager(this,geoJson,data,managerID)
     }
@@ -221,28 +221,25 @@ class MapManager {
     
         }
     
-        async createMap(geoJson, polygonData,markerData, mapID){
-    
+        async createMap(geoJson, polygonData, markerData, mapID) {
             this.createEventListenerManager();
-            this.createPolygonManager(geoJson, polygonData,mapID);
+            this.createPolygonManager(geoJson, polygonData, mapID);
+        
             this.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
-    
-            if(this.hasMarkerSet[mapID] == true){
-
-                await this.createMarkerManager(markerData,mapID);
+        
+            // Wait for ward data to load
+            await this.polygonManager.loadWardData();
+        
+            if (this.hasMarkerSet[mapID]) {
+                await this.createMarkerManager(markerData, mapID);
                 await this.markerManager.createMarkers(await this.markerManager.data);
                 this.placeHeatMap(await this.markerManager.data);
                 console.log('heatmap created');
-              
                 await this.markerManager.placeOnLatLong(this.markerManager.data);
                 console.log('markers generated');
-
-                
             }
-    
-            // this.addZoomOutListeners();
-    
         }
+        
     
     
     

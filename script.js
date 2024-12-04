@@ -21,7 +21,7 @@ window.safeSetDemographicStyle = safeSetDemographicStyle
 window.safeToggleAll = safeToggleAll
 window.safeToggleGroup = safeToggleGroup
 window.demographic_toggle = safe_Set_Demographic_Page
-
+window.showFeatures = showFeatures
 // Wrap the code for the checkbox and radio buttons to ensure mapManager is ready
 function safeToggleGroup(group, id) {
     if (isMapInitialized) {
@@ -73,7 +73,7 @@ function safeSetDemographicStyle(demographic) {
     }
 }
 
-export function all_toggle() {
+async function all_toggle() {
     if (!window.mapManager.polygonManager) {
         console.warn("PolygonManager not initialized yet. Aborting all_toggle.");
         return;
@@ -85,12 +85,33 @@ export function all_toggle() {
         }
         table.style.display = 'none';
     });
+    const wardData = window.mapManager.polygonManager.wardData;
+    const wards = window.mapManager.polygonManager.wardRankings; // Assuming wardRankings contains mapping
+    console.log(wardData)
+    if (!wardData) {
+        console.error('Ward data is not available.');
+        return;
+    }
+    const wardName = 'Ward 1';
+
+
+    const featureInfo = wardData[wardName] || {};
+    const tableTitle = document.querySelector('#table-title');
+    if (tableTitle) {
+        tableTitle.textContent = wardName;
+    }
+
+    window.mapManager.htmlManager.clearTable();
+    for (const [category, value] of Object.entries(featureInfo)) {
+        window.mapManager.htmlManager.addRow(category, value);
+    }
+    window.mapManager.htmlManager.showFeatureTable('data-container');
 
     safeSetDemographicStyle("Total Population");
     window.mapManager.polygonManager.addAllToggleListeners();
 }
 
-function demographic_toggle(option){
+function demographic_toggle_features(option){
     // window.mapManager.htmlManager.hideTable(window.mapManager.htmlManager.currentTableId)
     window.mapManager.htmlManager.showFeatureTable(option)
 
@@ -98,7 +119,7 @@ function demographic_toggle(option){
 
 function safe_Set_Demographic_Page(option) {
     if (isMapInitialized) {
-        
+
         // Close all open infoboxes
         window.mapManager.closeAllInfoBoxes();
         
@@ -106,6 +127,7 @@ function safe_Set_Demographic_Page(option) {
             // window.mapManager.htmlManager.hideTable(window.mapManager.htmlManager.currentTableId)
             all_toggle();
         } else {
+            console.log("Not all")
             window.mapManager.eventListeners.cleanupAllListeners();
             document.querySelector('#table-title').textContent = "Data Table";
             const tableBody = document.querySelector('#data-table tbody');
@@ -113,10 +135,117 @@ function safe_Set_Demographic_Page(option) {
                 tableBody.innerHTML = ''; // Removes all rows from the table body
             }
             window.mapManager.htmlManager.hideTable('data-container');
-            demographic_toggle(option);
+            demographic_toggle_features(option);
         }
     }
 }
+
+async function showFeatures(featureType) {
+    const featureTables = document.querySelectorAll('.parent-feature-table');
+
+    featureTables.forEach(table => {
+        table.style.display = 'none';
+        // Reset form elements
+        const inputs = table.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'radio') {
+                input.checked = false;
+            } else if (input.type === 'checkbox') {
+                input.checked = true;
+            }
+        });
+
+        const selects = table.querySelectorAll('select');
+        selects.forEach(select => {
+            select.selectedIndex = 0;
+        });
+    });
+
+    const featureTables2 = document.querySelectorAll('.feature-table');
+
+    featureTables2.forEach(table => {
+        table.style.display = 'none';
+        // Reset form elements
+        const inputs = table.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        const selects = table.querySelectorAll('select');
+        selects.forEach(select => {
+            select.selectedIndex = 0;
+        });
+
+        // Check all options except "All" for non-radio tables
+        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.id !== 'all') {
+                checkbox.checked = true;
+            }
+        });
+    });
+
+    // Close any open info windows
+    if (window.mapManager.polygonManager.infowindow != null) {
+        window.mapManager.polygonManager.infowindow.close();
+    }
+
+    // Clean up the map (clear markers, layers, etc.)
+    window.mapManager.cleanup();
+
+    if (featureType === 'Business') {
+        //this.hideTable();
+        document.getElementById('business-controls').style.display = 'block';
+        //Removing data on switching maps
+        window.mapManager.eventListeners.cleanupAllListeners()
+        // Create the Business map
+        window.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
+        window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
+        document.getElementById('data-container').style.display = 'none';
+    }
+
+    if (featureType === 'Demographic') {
+        window.mapManager.cleanup();
+        window.mapManager.businessMarkerManager.cleanup();
+        document.getElementById("businessSearch").value = '';        
+        document.getElementById('business-controls').style.display = 'none';
+        document.getElementById('demographic-controls').style.display = 'block';
+        document.getElementById('demo-all').checked = true
+        if (!window.mapManager.polygonManager) {
+            await window.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
+        }
+    
+        // Access wardData through window.mapManager
+        const wardData = window.mapManager.polygonManager.wardData;
+        const wards = window.mapManager.polygonManager.wardRankings; // Assuming wardRankings contains mapping
+        console.log(wardData)
+        if (!wardData) {
+            console.error('Ward data is not available.');
+            return;
+        }
+        const wardName = 'Ward 1';
+
+
+        const featureInfo = wardData[wardName] || {};
+        const tableTitle = document.querySelector('#table-title');
+        if (tableTitle) {
+            tableTitle.textContent = wardName;
+        }
+    
+        window.mapManager.htmlManager.clearTable();
+        for (const [category, value] of Object.entries(featureInfo)) {
+            window.mapManager.htmlManager.addRow(category, value);
+        }
+        window.mapManager.htmlManager.showFeatureTable('data-container');
+        safeSetDemographicStyle("Total Population");
+    }
+    
+}
+
 // Attach event listeners when the page loads, but only call the mapManager methods when it's ready
 // document.addEventListener('DOMContentLoaded', function() {
 //     const wardCheckboxes = document.querySelectorAll('[id^="Ward"]');
