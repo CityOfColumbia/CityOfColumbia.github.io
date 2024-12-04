@@ -240,7 +240,7 @@ class MapManager {
                 
             }
     
-            this.addZoomOutListeners();
+            // this.addZoomOutListeners();
     
         }
     

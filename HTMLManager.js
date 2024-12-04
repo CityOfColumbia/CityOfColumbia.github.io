@@ -96,7 +96,7 @@ class HTMLManager {
             document.getElementById('demo-all').checked = true;
 
             // Add any necessary listeners for zoom or other actions
-            this.mapManager.addZoomOutListeners();
+            // this.mapManager.addZoomOutListeners();
             // Remove the All info table 
             document.getElementById('data-container').style.display = 'none';
         }
