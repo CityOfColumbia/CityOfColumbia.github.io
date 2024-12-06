@@ -15,12 +15,12 @@ export const wards = {
 // };
 
 export const RGBAValues = [
-    'rgba(255, 0, 0, 1)',     
-    'rgba(255, 77, 0, 1)',     
-    'rgba(255, 127, 0, 1)',     
-    'rgba(255, 153, 51, 1)',     
-    'rgba(255, 178, 102, 1)',
-    'rgba(255, 230, 204, 1)'
+    'rgba(255, 0, 0, .7)',     
+    'rgba(255, 77, 0, .7)',     
+    'rgba(255, 127, 0, .7)',     
+    'rgba(255, 153, 51, .7)',     
+    'rgba(255, 178, 102, .7)',
+    'rgba(255, 230, 204, .7)'
      ]
 
 export const DemographicHierarchy = {
