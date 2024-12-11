@@ -2,11 +2,11 @@
 import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
 
  export class PolygonManager {
-    constructor(mapManager, wardGeoJsonUrl, managerID, htmlManager ) {
+    constructor(mapManager, GeoJsonUrl, managerID, htmlManager ) {
 
         this.mapManager = mapManager
         this.htmlManager = htmlManager
-        this.wardGeoJsonUrl = wardGeoJsonUrl;
+        this.GeoJsonUrl = GeoJsonUrl;
         this.infowindow = null;
         this.infoboxes = [];
         this.featureData = {};
@@ -14,7 +14,6 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         this.managerID = managerID;
         this.polygons = {};
         this.loadBooneCounty()
-        this.loadWardGeoJson();
     }
 
     async loadBooneCounty() {
@@ -30,18 +29,7 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         });
     }
 
-    async loadWardGeoJson() {
-        this.mapManager.map.data.loadGeoJson(this.wardGeoJsonUrl, null, (features) => {
-            features.forEach((feature) => {
-                feature.setProperty('visible', true);
-                let wardName = wards[feature.getProperty('Name')];
-                if (!this.polygons[wardName]) {
-                    this.polygons[wardName] = [];
-                }
-                this.polygons[wardName].push(feature);
-            });
-        });
-    }
+
 
     setAllStyle(fillColor,fillOpacity,strokeColor,strokeWeight) {
         this.mapManager.map.data.setStyle({
@@ -107,11 +95,23 @@ export class BusinessPolygons extends PolygonManager {
         super(mapManager, geoJsonUrl, polygonData,managerID);
         this.infowindow = null; // Define infowindow as a property of the class
         this.csvUrl = polygonData;
-        this.loadWardData()
+        this.loadWardGeoJson();
+        this.loadPolygonData()
         this.addInfoBoxes();
     }
-
-    loadWardData() {
+    async loadWardGeoJson() {
+        this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
+            features.forEach((feature) => {
+                feature.setProperty('visible', true);
+                let wardName = wards[feature.getProperty('Name')];
+                if (!this.polygons[wardName]) {
+                    this.polygons[wardName] = [];
+                }
+                this.polygons[wardName].push(feature);
+            });
+        });
+    }
+    loadPolygonData() {
         fetch(this.csvUrl)
             .then(response => response.text())
             .then(csvText => {
@@ -206,7 +206,9 @@ export class DemographicPolygons extends PolygonManager {
         
         super(map, geoJsonUrl, managerID);
         this.csvData = polygonData;
-        this.loadWardData().then(({ dataList,wardRankings, minMaxValues }) => {
+        this.loadWardGeoJson();
+
+        this.loadPolygonData().then(({ dataList,wardRankings, minMaxValues }) => {
             this.wardData = dataList;
 
             this.wardRankings = wardRankings
@@ -217,8 +219,19 @@ export class DemographicPolygons extends PolygonManager {
 
         });
     }
-
-    async loadWardData() {
+    async loadWardGeoJson() {
+        this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
+            features.forEach((feature) => {
+                feature.setProperty('visible', true);
+                let wardName = wards[feature.getProperty('Name')];
+                if (!this.polygons[wardName]) {
+                    this.polygons[wardName] = [];
+                }
+                this.polygons[wardName].push(feature);
+            });
+        });
+    }
+    async loadPolygonData() {
         const dataList = {};
         const minMaxValues = {};
         const wardRankings = {};
@@ -491,6 +504,95 @@ export class DemographicPolygons extends PolygonManager {
     }
 }
 
+export class TractPolygons extends PolygonManager {
 
+    constructor(map, geoJsonUrl, polygonData, managerID) {
+        
+        super(map, geoJsonUrl, managerID);
+        this.loadBlockGeoJson();
+        this.csvData = polygonData;
+        this.dataList = {}
+        console.log("Constructing BlockPolygons!")
+        console.log("Poglyons!", this.polygons)
+        this.loadPolygonData().then(dataList => {
+            this.dataList = dataList;
+
+
+
+        });
+        console.log("DATALIST!", this.dataList)
+    }
+    async loadBlockGeoJson() {
+        this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
+            features.forEach((feature) => {
+                feature.setProperty('visible', true);
+                let Name = feature.getProperty('GEOID10');
+                if (!this.polygons[Name]) {
+                    this.polygons[Name] = [];
+                }
+                this.polygons[Name].push(feature);
+            });
+        });
+    }
+    async loadPolygonData() {
+        const dataList = {};
+        const minMaxValues = {};
+    
+        try {
+            const response = await fetch(this.csvData);
+            const csvText = await response.text();
+            const rows = csvText.split('\n');
+            const headers = rows[0].split(',');
+    
+            // Initialize minMaxValues with Infinity and -Infinity
+            headers.forEach(header => {
+                if (header.trim() !== 'GEOID10') {
+                    minMaxValues[header.trim()] = { Minimum: Infinity, Maximum: -Infinity };
+                }
+            });
+    
+            rows.slice(1).forEach(row => {
+                // Use a regular expression to split the row, accounting for quoted commas
+                const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                if (!values) return;
+    
+                const geoidIndex = headers.indexOf('GEOID10');
+                if (geoidIndex === -1 || !values[geoidIndex]) {
+                    return; // Skip rows without GEOID10
+                }
+                const geoid = values[geoidIndex].replace(/"/g, '').trim();
+    
+                const rowDict = {};
+                headers.forEach((header, index) => {
+                    if (header.trim() !== 'GEOID10' && values[index] !== undefined) {
+                        let value = values[index].replace(/"/g, '').trim();
+                        rowDict[header.trim()] = value;
+    
+                        // Update min and max values
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                            if (numValue < minMaxValues[header.trim()].Minimum) {
+                                minMaxValues[header.trim()].Minimum = numValue;
+                            }
+                            if (numValue > minMaxValues[header.trim()].Maximum) {
+                                minMaxValues[header.trim()].Maximum = numValue;
+                            }
+                        }
+                    }
+                });
+    
+                dataList[geoid] = rowDict;
+            });
+    
+            dataList['MinMax'] = minMaxValues;
+    
+            console.log("Data List:", dataList);
+            return dataList;
+        } catch (error) {
+            console.error('Error loading CSV data:', error);
+            return { dataList: {}, minMaxValues: {} };
+        }
+    }
+}
 
 

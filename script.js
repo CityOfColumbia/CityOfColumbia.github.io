@@ -188,16 +188,17 @@ async function showFeatures(featureType) {
             }
         });
     });
-
     // Close any open info windows
     if (window.mapManager.polygonManager.infowindow != null) {
+
         window.mapManager.polygonManager.infowindow.close();
     }
 
     // Clean up the map (clear markers, layers, etc.)
-    window.mapManager.cleanup();
 
     if (featureType === 'Business') {
+        window.mapManager.cleanup();
+
         //this.hideTable();
         document.getElementById('business-controls').style.display = 'block';
         //Removing data on switching maps
@@ -244,6 +245,19 @@ async function showFeatures(featureType) {
         safeSetDemographicStyle("Total Population");
     }
     
+    if(featureType == 'Tract'){
+        console.log("test")
+        window.mapManager.cleanup();
+        window.mapManager.eventListeners.cleanupAllListeners()
+        document.getElementById("businessSearch").value = '';        
+        document.getElementById('business-controls').style.display = 'none';
+        window.mapManager.htmlManager.hideTable('data-container');
+
+        if (!window.mapManager.polygonManager) {
+
+        await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
+        }
+    }
 }
 
 // Attach event listeners when the page loads, but only call the mapManager methods when it's ready
