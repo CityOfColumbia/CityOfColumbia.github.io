@@ -1,5 +1,5 @@
 //import BusinessPolygons from './PolygonManager.js'
-import {DemographicPolygons,BusinessPolygons,PolygonManager} from './PolygonManager.js'
+import {DemographicPolygons,BusinessPolygons,TractPolygons,PolygonManager} from './PolygonManager.js'
 import HTMLManager from './HTMLManager.js'
 import BusinessMarkers from './Markers.js'
 import EventListenerManager from './EventListenerManager.js'
@@ -10,11 +10,14 @@ class MapManager {
     constructor(){
         this.hasMarkerSet = {
             'Business':true,
-            'Demographic':false
+            'Demographic':false,
+            'Tract':false
         }
+        
         this.polygonManagerTypes = {
             'Business':BusinessPolygons,
-            'Demographic':DemographicPolygons
+            'Demographic':DemographicPolygons,
+            'Tract':TractPolygons
         };
 
         this.markerManagerTypes = {
@@ -228,7 +231,7 @@ class MapManager {
             this.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         
             // Wait for ward data to load
-            await this.polygonManager.loadWardData();
+            await this.polygonManager.loadPolygonData();
         
             if (this.hasMarkerSet[mapID]) {
                 await this.createMarkerManager(markerData, mapID);
