@@ -524,7 +524,6 @@ export class TractPolygons extends PolygonManager {
 
 
     }
-
     async loadBlockGeoJson() {
         this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
             features.forEach((feature) => {
@@ -534,15 +533,18 @@ export class TractPolygons extends PolygonManager {
                     this.polygons[Name] = [];
                 }
                 this.polygons[Name].push(feature);
-
-                // Add a click listener to each polygon
-                this.mapManager.map.data.addListener('click', (event) => {
-                    //console.log('Features',feature);
+    
+                // Add a click listener to each polygon and track it
+                const clickListener = this.mapManager.map.data.addListener('click', (event) => {
                     this.showInfoBox(event, feature);
                 });
+    
+                // Store the listener in the array for later cleanup
+                this.polygonListeners.push(clickListener);
             });
         });
     }
+    
 
     async loadPolygonData() {
         const dataList = {};
@@ -658,13 +660,21 @@ export class TractPolygons extends PolygonManager {
             console.warn(`No data found for GEOID: ${geoid}`);
         }
     }
-
     cleanup() {
-        // Clear all features from the map (removes associated listeners)
-        this.mapManager.map.data.forEach((feature) => this.mapManager.map.data.remove(feature));
-        
         // Close InfoWindow
-        this.infoWindow.close();
+        if (this.infoWindow) {
+            this.infoWindow.close();
+        }
+    
+        // Remove all features and event listeners
+        this.mapManager.map.data.forEach((feature) => {
+            this.mapManager.map.data.remove(feature);
+        });
+    
+        // Clear the list of polygon event listeners
+        this.polygonListeners.forEach(listener => google.maps.event.removeListener(listener));
+        this.polygonListeners = [];
     }
+    
     
 }

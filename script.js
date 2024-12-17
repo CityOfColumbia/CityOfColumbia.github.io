@@ -139,7 +139,6 @@ function safe_Set_Demographic_Page(option) {
         }
     }
 }
-
 async function showFeatures(featureType) {
     const featureTables = document.querySelectorAll('.parent-feature-table');
 
@@ -150,20 +149,19 @@ async function showFeatures(featureType) {
         inputs.forEach(input => input.checked = false);
     });
 
-   // Close the InfoWindow if it's open
-   if (window.mapManager.polygonManager && window.mapManager.polygonManager.infoWindow) {
-    window.mapManager.cleanup();
-}
-    // Clean up the map (clear markers, layers, etc.)
+    // Close the InfoWindow if it's open and clean up polygonManager
+    if (window.mapManager.polygonManager) {
+        if (window.mapManager.polygonManager.infoWindow) {
+            window.mapManager.polygonManager.infoWindow.close();  // Close InfoWindow
+        }
+        window.mapManager.polygonManager.cleanup();  // Clean up event listeners and features
+    }
 
+    // Clean up the map (clear markers, layers, etc.)
     if (featureType === 'Business') {
         window.mapManager.cleanup();
-
-        //this.hideTable();
         document.getElementById('business-controls').style.display = 'block';
-        //Removing data on switching maps
         window.mapManager.eventListeners.cleanupAllListeners();
-        // Create the Business map
         window.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         document.getElementById('data-container').style.display = 'none';
@@ -172,30 +170,30 @@ async function showFeatures(featureType) {
     if (featureType === 'Demographic') {
         window.mapManager.cleanup();
         window.mapManager.businessMarkerManager.cleanup();
-        window.mapManager.eventListeners.cleanupAllListeners();
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         document.getElementById('demographic-controls').style.display = 'block';
-        document.getElementById('demo-all').checked = true
+        document.getElementById('demo-all').checked = true;
+        
         if (!window.mapManager.polygonManager) {
             await window.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
         }
-    
-        // Access wardData through window.mapManager
+        
         const wardData = window.mapManager.polygonManager.wardData;
-        const wards = window.mapManager.polygonManager.wardRankings; // Assuming wardRankings contains mapping
-        console.log(wardData)
+        const wards = window.mapManager.polygonManager.wardRankings;
+        
         if (!wardData) {
             console.error('Ward data is not available.');
             return;
         }
+
         const wardName = 'Ward 1';
         const featureInfo = wardData[wardName] || {};
         const tableTitle = document.querySelector('#table-title');
         if (tableTitle) {
             tableTitle.textContent = wardName;
         }
-    
+        
         window.mapManager.htmlManager.clearTable();
         for (const [category, value] of Object.entries(featureInfo)) {
             window.mapManager.htmlManager.addRow(category, value);
@@ -204,21 +202,16 @@ async function showFeatures(featureType) {
         safeSetDemographicStyle("Total Population");
     }
     
-    if(featureType == 'Tract'){
+    if (featureType === 'Tract') {
         console.log("TRACT initiated")
         window.mapManager.cleanup();
-        window.mapManager.eventListeners.cleanupAllListeners()
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         window.mapManager.htmlManager.hideTable('data-container');
 
         if (!window.mapManager.polygonManager) {
-
-        await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
-
+            await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
         }
-        
-    
-
     }
 }
+
