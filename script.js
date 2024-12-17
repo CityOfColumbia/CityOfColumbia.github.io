@@ -143,57 +143,18 @@ function safe_Set_Demographic_Page(option) {
 async function showFeatures(featureType) {
     const featureTables = document.querySelectorAll('.parent-feature-table');
 
+    // Reset UI elements and hide tables
     featureTables.forEach(table => {
         table.style.display = 'none';
-        // Reset form elements
         const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio') {
-                input.checked = false;
-            } else if (input.type === 'checkbox') {
-                input.checked = true;
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
+        inputs.forEach(input => input.checked = false);
     });
 
-    const featureTables2 = document.querySelectorAll('.feature-table');
-
-    featureTables2.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Check all options except "All" for non-radio tables
-        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.id !== 'all') {
-                checkbox.checked = true;
-            }
-        });
-    });
-    // Close any open info windows
-    if (window.mapManager.polygonManager.infowindow != null) {
-
-        window.mapManager.polygonManager.infowindow.close();
-    }
-
+   // Close the InfoWindow if it's open
+   if (window.mapManager.polygonManager && window.mapManager.polygonManager.infoWindow) {
+    window.mapManager.polygonManager.infoWindow.close();
+   
+}
     // Clean up the map (clear markers, layers, etc.)
 
     if (featureType === 'Business') {
@@ -202,7 +163,7 @@ async function showFeatures(featureType) {
         //this.hideTable();
         document.getElementById('business-controls').style.display = 'block';
         //Removing data on switching maps
-        window.mapManager.eventListeners.cleanupAllListeners()
+        window.mapManager.eventListeners.cleanupAllListeners();
         // Create the Business map
         window.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
@@ -212,6 +173,7 @@ async function showFeatures(featureType) {
     if (featureType === 'Demographic') {
         window.mapManager.cleanup();
         window.mapManager.businessMarkerManager.cleanup();
+        window.mapManager.eventListeners.cleanupAllListeners();
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         document.getElementById('demographic-controls').style.display = 'block';
@@ -229,8 +191,6 @@ async function showFeatures(featureType) {
             return;
         }
         const wardName = 'Ward 1';
-
-
         const featureInfo = wardData[wardName] || {};
         const tableTitle = document.querySelector('#table-title');
         if (tableTitle) {
@@ -241,12 +201,12 @@ async function showFeatures(featureType) {
         for (const [category, value] of Object.entries(featureInfo)) {
             window.mapManager.htmlManager.addRow(category, value);
         }
-        window.mapManager.htmlManager.showFeatureTable('data-container');
+        await window.mapManager.htmlManager.showFeatureTable('data-container');
         safeSetDemographicStyle("Total Population");
     }
     
     if(featureType == 'Tract'){
-        console.log("test")
+        console.log("TRACT initiated")
         window.mapManager.cleanup();
         window.mapManager.eventListeners.cleanupAllListeners()
         document.getElementById("businessSearch").value = '';        
@@ -257,6 +217,8 @@ async function showFeatures(featureType) {
 
         await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
         }
-        
+       
+    
+
     }
 }

@@ -512,13 +512,13 @@ export class TractPolygons extends PolygonManager {
         this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
 
         console.log("Constructing BlockPolygons!");
-        console.log("Polygons!", this.polygons);
 
         this.loadPolygonData().then(dataList => {
             this.dataList = dataList;
         });
 
-        console.log("DATALIST!", this.dataList);
+
+
     }
 
     async loadBlockGeoJson() {
@@ -533,7 +533,7 @@ export class TractPolygons extends PolygonManager {
 
                 // Add a click listener to each polygon
                 this.mapManager.map.data.addListener('click', (event) => {
-                    console.log('Features',feature);
+                    //console.log('Features',feature);
                     this.showInfoBox(event, feature);
                 });
             });
@@ -586,13 +586,10 @@ export class TractPolygons extends PolygonManager {
                 });
 
                 dataList[geoid] = rowDict;
-                console.log("rowdict:", rowDict); // From loadPolygonData
                
             });
 
             dataList['MinMax'] = minMaxValues;
-
-            console.log("Data List:", dataList);
             return dataList;
         } catch (error) {
             console.error('Error loading CSV data:', error);
@@ -603,12 +600,9 @@ export class TractPolygons extends PolygonManager {
     showInfoBox(event, feature) {
         const geoid = event.feature.getProperty('GEOID10');
         const polygonData = this.dataList[geoid];
-        console.log("showinfobox event:",geoid, event.feature.getProperty('GEOID10')); // From loadPolygonData
-        console.log("showinfobox GEOID10 in CSV:", geoid,this.dataList[geoid]); // From loadPolygonData
+        //console.log("showinfobox event:",geoid, event.feature.getProperty('GEOID10')); // From loadPolygonData
 
         if (polygonData) {
-            // Format the content for the InfoBox
-            console.log('in showinfobox event lat lang',event.latLng)
             const demographicData = `
                 <ul>
                     <li><strong>Total Population:</strong> ${polygonData['Total:']}</li>
@@ -652,9 +646,10 @@ export class TractPolygons extends PolygonManager {
     
             // Set content and open the InfoWindow
             this.infoWindow.setContent(content);
-            
             this.infoWindow.setPosition(event.latLng); // Show at clicked location
             this.infoWindow.open(this.mapManager.map);
+
+
         } else {
             console.warn(`No data found for GEOID: ${geoid}`);
         }
