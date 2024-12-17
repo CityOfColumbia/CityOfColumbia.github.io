@@ -152,8 +152,7 @@ async function showFeatures(featureType) {
 
    // Close the InfoWindow if it's open
    if (window.mapManager.polygonManager && window.mapManager.polygonManager.infoWindow) {
-    window.mapManager.polygonManager.infoWindow.close();
-   
+    window.mapManager.cleanup();
 }
     // Clean up the map (clear markers, layers, etc.)
 
@@ -216,8 +215,9 @@ async function showFeatures(featureType) {
         if (!window.mapManager.polygonManager) {
 
         await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
+
         }
-       
+        
     
 
     }

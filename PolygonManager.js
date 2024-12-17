@@ -14,7 +14,9 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         this.managerID = managerID;
         this.polygons = {};
         this.loadBooneCounty()
+       
     }
+    
 
     async loadBooneCounty() {
         this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
@@ -503,6 +505,8 @@ export class DemographicPolygons extends PolygonManager {
         return RGBAValues[rank - 1]
     }
 }
+
+
 export class TractPolygons extends PolygonManager {
     constructor(map, geoJsonUrl, polygonData, managerID) {
         super(map, geoJsonUrl, managerID);
@@ -510,7 +514,7 @@ export class TractPolygons extends PolygonManager {
         this.csvData = polygonData;
         this.dataList = {};
         this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
-
+        this.polygonListeners = []; // Track polygon event listeners
         console.log("Constructing BlockPolygons!");
 
         this.loadPolygonData().then(dataList => {
@@ -653,6 +657,14 @@ export class TractPolygons extends PolygonManager {
         } else {
             console.warn(`No data found for GEOID: ${geoid}`);
         }
+    }
+
+    cleanup() {
+        // Clear all features from the map (removes associated listeners)
+        this.mapManager.map.data.forEach((feature) => this.mapManager.map.data.remove(feature));
+        
+        // Close InfoWindow
+        this.infoWindow.close();
     }
     
 }
