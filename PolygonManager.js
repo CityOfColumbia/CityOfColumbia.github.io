@@ -14,7 +14,9 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         this.managerID = managerID;
         this.polygons = {};
         this.loadBooneCounty()
+       
     }
+    
 
     async loadBooneCounty() {
         this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
@@ -504,23 +506,23 @@ export class DemographicPolygons extends PolygonManager {
     }
 }
 
-export class TractPolygons extends PolygonManager {
 
+export class TractPolygons extends PolygonManager {
     constructor(map, geoJsonUrl, polygonData, managerID) {
-        
         super(map, geoJsonUrl, managerID);
         this.loadBlockGeoJson();
         this.csvData = polygonData;
-        this.dataList = {}
-        console.log("Constructing BlockPolygons!")
-        console.log("Poglyons!", this.polygons)
+        this.dataList = {};
+        this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
+        this.polygonListeners = []; // Track polygon event listeners
+        console.log("Constructing BlockPolygons!");
+
         this.loadPolygonData().then(dataList => {
             this.dataList = dataList;
-
-
-
         });
-        console.log("DATALIST!", this.dataList)
+
+
+
     }
     async loadBlockGeoJson() {
         this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
@@ -531,9 +533,19 @@ export class TractPolygons extends PolygonManager {
                     this.polygons[Name] = [];
                 }
                 this.polygons[Name].push(feature);
+    
+                // Add a click listener to each polygon and track it
+                const clickListener = this.mapManager.map.data.addListener('click', (event) => {
+                    this.showInfoBox(event, feature);
+                });
+    
+                // Store the listener in the array for later cleanup
+                this.polygonListeners.push(clickListener);
             });
         });
     }
+    
+
     async loadPolygonData() {
         const dataList = {};
         const minMaxValues = {};
@@ -543,32 +555,30 @@ export class TractPolygons extends PolygonManager {
             const csvText = await response.text();
             const rows = csvText.split('\n');
             const headers = rows[0].split(',');
-    
+
             // Initialize minMaxValues with Infinity and -Infinity
             headers.forEach(header => {
                 if (header.trim() !== 'GEOID10') {
                     minMaxValues[header.trim()] = { Minimum: Infinity, Maximum: -Infinity };
                 }
             });
-    
+
             rows.slice(1).forEach(row => {
-                // Use a regular expression to split the row, accounting for quoted commas
                 const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                 if (!values) return;
-    
+
                 const geoidIndex = headers.indexOf('GEOID10');
                 if (geoidIndex === -1 || !values[geoidIndex]) {
-                    return; // Skip rows without GEOID10
+                    return;
                 }
                 const geoid = values[geoidIndex].replace(/"/g, '').trim();
-    
+
                 const rowDict = {};
                 headers.forEach((header, index) => {
                     if (header.trim() !== 'GEOID10' && values[index] !== undefined) {
                         let value = values[index].replace(/"/g, '').trim();
                         rowDict[header.trim()] = value;
-    
-                        // Update min and max values
+
                         const numValue = parseFloat(value);
                         if (!isNaN(numValue)) {
                             if (numValue < minMaxValues[header.trim()].Minimum) {
@@ -580,19 +590,88 @@ export class TractPolygons extends PolygonManager {
                         }
                     }
                 });
-    
+
                 dataList[geoid] = rowDict;
+               
             });
-    
+
             dataList['MinMax'] = minMaxValues;
-    
-            console.log("Data List:", dataList);
             return dataList;
         } catch (error) {
             console.error('Error loading CSV data:', error);
             return { dataList: {}, minMaxValues: {} };
         }
     }
+
+    showInfoBox(event, feature) {
+        const geoid = event.feature.getProperty('GEOID10');
+        const polygonData = this.dataList[geoid];
+        //console.log("showinfobox event:",geoid, event.feature.getProperty('GEOID10')); // From loadPolygonData
+
+        if (polygonData) {
+            const demographicData = `
+                <ul>
+                    <li><strong>Total Population:</strong> ${polygonData['Total:']}</li>
+                    <li><strong>Male Population:</strong> ${polygonData['Male:']}</li>
+                    <li><strong>Female Population:</strong> ${polygonData['Female:']}</li>
+                </ul>
+            `;
+    
+            const ageData = `
+                <ul>
+                    ${Object.entries(polygonData)
+                        .filter(([key]) => key.match(/\byears\b|\bover\b/))
+                        .map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`)
+                        .join('')}
+                </ul>
+            `;
+    
+            const geographyData = `
+                <ul>
+                    <li><strong>Name:</strong> ${polygonData['Name']}</li>
+                    <li><strong>Block Group:</strong> ${polygonData['Block Group']}</li>
+                    <li><strong>Census Tract:</strong> ${polygonData['Census Tract']}</li>
+                    <li><strong>County:</strong> ${polygonData['County']}</li>
+                    <li><strong>State:</strong> ${polygonData['State']}</li>
+                    <li><strong>Ward:</strong> ${polygonData['Ward']}</li>
+                </ul>
+            `;
+    
+            // Combine content sections
+            const content = `
+                <div>
+                    <h3>Tract: ${geoid}</h3>
+                    <h4>Geography</h4>
+                    ${geographyData}
+                    <h4>Demographics</h4>
+                    ${demographicData}
+                    <h4>Age Distribution</h4>
+                    ${ageData}
+                </div>
+            `;
+    
+            // Set content and open the InfoWindow
+            this.infoWindow.setContent(content);
+            this.infoWindow.setPosition(event.latLng); // Show at clicked location
+            this.infoWindow.open(this.mapManager.map);
+
+
+        } else {
+            console.warn(`No data found for GEOID: ${geoid}`);
+        }
+    }
+    cleanup() {
+        // Close InfoWindow
+        if (this.infoWindow) {
+            this.infoWindow.close();
+        }
+    
+
+    
+        // Clear the list of polygon event listeners
+        this.polygonListeners.forEach(listener => google.maps.event.removeListener(listener));
+        this.polygonListeners = [];
+    }
+    
+    
 }
-
-

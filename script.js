@@ -139,71 +139,34 @@ function safe_Set_Demographic_Page(option) {
         }
     }
 }
-
 async function showFeatures(featureType) {
     const featureTables = document.querySelectorAll('.parent-feature-table');
 
+    // Reset UI elements and hide tables
     featureTables.forEach(table => {
         table.style.display = 'none';
-        // Reset form elements
         const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio') {
-                input.checked = false;
-            } else if (input.type === 'checkbox') {
-                input.checked = true;
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
+        inputs.forEach(input => input.checked = false);
     });
 
-    const featureTables2 = document.querySelectorAll('.feature-table');
+    // Close the InfoWindow if it's open and clean up polygonManager
+    if (window.mapManager.polygonManager) {
 
-    featureTables2.forEach(table => {
-        table.style.display = 'none';
-        // Reset form elements
-        const inputs = table.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-
-        const selects = table.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Check all options except "All" for non-radio tables
-        const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.id !== 'all') {
-                checkbox.checked = true;
-            }
-        });
-    });
-    // Close any open info windows
+        if (window.mapManager.polygonManager.infoWindow!= null) {
+            window.mapManager.polygonManager.infoWindow.close();  // Close InfoWindow
+        }
+        window.mapManager.polygonManager.cleanup();  // Clean up event listeners and features
+    }
     if (window.mapManager.polygonManager.infowindow != null) {
 
         window.mapManager.polygonManager.infowindow.close();
     }
 
     // Clean up the map (clear markers, layers, etc.)
-
     if (featureType === 'Business') {
         window.mapManager.cleanup();
-
-        //this.hideTable();
         document.getElementById('business-controls').style.display = 'block';
-        //Removing data on switching maps
-        window.mapManager.eventListeners.cleanupAllListeners()
-        // Create the Business map
+        window.mapManager.eventListeners.cleanupAllListeners();
         window.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         document.getElementById('data-container').style.display = 'none';
@@ -215,111 +178,45 @@ async function showFeatures(featureType) {
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         document.getElementById('demographic-controls').style.display = 'block';
-        document.getElementById('demo-all').checked = true
+        document.getElementById('demo-all').checked = true;
+        
         if (!window.mapManager.polygonManager) {
             await window.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
         }
-    
-        // Access wardData through window.mapManager
+        
         const wardData = window.mapManager.polygonManager.wardData;
-        const wards = window.mapManager.polygonManager.wardRankings; // Assuming wardRankings contains mapping
-        console.log(wardData)
+        const wards = window.mapManager.polygonManager.wardRankings;
+        
         if (!wardData) {
             console.error('Ward data is not available.');
             return;
         }
+
         const wardName = 'Ward 1';
-
-
         const featureInfo = wardData[wardName] || {};
         const tableTitle = document.querySelector('#table-title');
         if (tableTitle) {
             tableTitle.textContent = wardName;
         }
-    
+        
         window.mapManager.htmlManager.clearTable();
         for (const [category, value] of Object.entries(featureInfo)) {
             window.mapManager.htmlManager.addRow(category, value);
         }
-        window.mapManager.htmlManager.showFeatureTable('data-container');
+        await window.mapManager.htmlManager.showFeatureTable('data-container');
         safeSetDemographicStyle("Total Population");
     }
     
-    if(featureType == 'Tract'){
-        console.log("test")
+    if (featureType === 'Tract') {
+        console.log("TRACT initiated")
         window.mapManager.cleanup();
-        window.mapManager.eventListeners.cleanupAllListeners()
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         window.mapManager.htmlManager.hideTable('data-container');
 
         if (!window.mapManager.polygonManager) {
-
-        await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
+            await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
         }
     }
 }
 
-// Attach event listeners when the page loads, but only call the mapManager methods when it's ready
-// document.addEventListener('DOMContentLoaded', function() {
-//     const wardCheckboxes = document.querySelectorAll('[id^="Ward"]');
-//     wardCheckboxes.forEach((checkbox) => {
-//         checkbox.addEventListener('click', function(event) {
-//             const wardId = event.target.id;
-//             safeToggleGroup('Ward', wardId);
-//         });
-//     });
-
-//     const allCheckbox = document.getElementById('all');
-//     if (allCheckbox) {
-//         allCheckbox.addEventListener('click', function() {
-//             safeToggleAll();
-//         });
-//     }
-
-//     // Feature Toggle Radio Buttons (Demographic / Business)
-//     const featureRadios = document.querySelectorAll('input[name="feature"]');
-//     featureRadios.forEach((radio) => {
-//         radio.addEventListener('click', function(event) {
-//             const feature = event.target.value;
-//             htmlManager.showFeatures(feature); // Assuming this method exists
-//         });
-//     });
-
-//     // Demographic Controls (race, age, sex)
-//     const demographicRadios = document.querySelectorAll('input[name="demographic"]');
-//     demographicRadios.forEach((radio) => {
-//         radio.addEventListener('click', function(event) {
-//             const demographicId = event.target.id;
-//             htmlManager.showTable(demographicId + '-controls'); // Assuming this method exists
-
-//             // Set the demographic style for the map based on the selection
-//             switch (demographicId) {
-//                 case 'race':
-//                     const raceRadios = document.querySelectorAll('input[name="race"]');
-//                     raceRadios.forEach((radio) => {
-//                         radio.addEventListener('click', function() {
-//                             safeSetDemographicStyle(radio.id);
-//                         });
-//                     });
-//                     break;
-//                 case 'age':
-//                     const ageRadios = document.querySelectorAll('input[name="age"]');
-//                     ageRadios.forEach((radio) => {
-//                         radio.addEventListener('click', function() {
-//                             safeSetDemographicStyle(radio.id);
-//                         });
-//                     });
-//                     break;
-//                 case 'sex':
-//                     const sexRadios = document.querySelectorAll('input[name="sex"]');
-//                     sexRadios.forEach((radio) => {
-//                         radio.addEventListener('click', function() {
-//                             safeSetDemographicStyle(radio.id);
-//                         });
-//                     });
-//                     break;
-//             }
-//         });
-//     });
-// });
