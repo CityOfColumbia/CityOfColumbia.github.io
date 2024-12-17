@@ -151,10 +151,15 @@ async function showFeatures(featureType) {
 
     // Close the InfoWindow if it's open and clean up polygonManager
     if (window.mapManager.polygonManager) {
-        if (window.mapManager.polygonManager.infoWindow) {
+
+        if (window.mapManager.polygonManager.infoWindow!= null) {
             window.mapManager.polygonManager.infoWindow.close();  // Close InfoWindow
         }
         window.mapManager.polygonManager.cleanup();  // Clean up event listeners and features
+    }
+    if (window.mapManager.polygonManager.infowindow != null) {
+
+        window.mapManager.polygonManager.infowindow.close();
     }
 
     // Clean up the map (clear markers, layers, etc.)

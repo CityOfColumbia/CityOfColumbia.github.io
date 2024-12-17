@@ -666,10 +666,7 @@ export class TractPolygons extends PolygonManager {
             this.infoWindow.close();
         }
     
-        // Remove all features and event listeners
-        this.mapManager.map.data.forEach((feature) => {
-            this.mapManager.map.data.remove(feature);
-        });
+
     
         // Clear the list of polygon event listeners
         this.polygonListeners.forEach(listener => google.maps.event.removeListener(listener));
