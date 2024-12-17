@@ -601,14 +601,14 @@ export class TractPolygons extends PolygonManager {
     }
 
     showInfoBox(event, feature) {
-        const geoid = feature.getProperty('GEOID10');
+        const geoid = event.feature.getProperty('GEOID10');
         const polygonData = this.dataList[geoid];
-       
-        console.log("GEOID10sadsda in CSV:", geoid,this.dataList); // From loadPolygonData
+        console.log("showinfobox event:",geoid, event.feature.getProperty('GEOID10')); // From loadPolygonData
+        console.log("showinfobox GEOID10 in CSV:", geoid,this.dataList[geoid]); // From loadPolygonData
 
         if (polygonData) {
             // Format the content for the InfoBox
-            console.log('event lat lang',event.latLng)
+            console.log('in showinfobox event lat lang',event.latLng)
             const demographicData = `
                 <ul>
                     <li><strong>Total Population:</strong> ${polygonData['Total:']}</li>
@@ -640,7 +640,7 @@ export class TractPolygons extends PolygonManager {
             // Combine content sections
             const content = `
                 <div>
-                    <h3>Data for GEOID: ${geoid}</h3>
+                    <h3>Tract: ${geoid}</h3>
                     <h4>Geography</h4>
                     ${geographyData}
                     <h4>Demographics</h4>
