@@ -547,12 +547,12 @@ export class TractPolygons extends PolygonManager {
         this.mapManager.map.data.loadGeoJson(this.GeoJsonUrl, null, (features) => {
             features.forEach((feature) => {
                 feature.setProperty('visible', true);
-                let Name = feature.getProperty('GEOID10');
+                let Name = feature.getProperty('GEOID20');
                 if (!this.polygons[Name]) {
                     this.polygons[Name] = [];
                 }
                 this.polygons[Name].push(feature);
-    
+                
                 // Add a click listener to each polygon and track it
                 const clickListener = this.mapManager.map.data.addListener('click', (event) => {
                     this.showInfoBox(event, feature);
@@ -568,7 +568,7 @@ export class TractPolygons extends PolygonManager {
     async loadPolygonData() {
         const dataList = {};
         const minMaxValues = {};
-    
+        
         try {
             const response = await fetch(this.csvData);
             const csvText = await response.text();
@@ -583,10 +583,12 @@ export class TractPolygons extends PolygonManager {
             });
 
             rows.slice(1).forEach(row => {
+                
                 const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                 if (!values) return;
 
                 const geoidIndex = headers.indexOf('GEOID10');
+                
                 if (geoidIndex === -1 || !values[geoidIndex]) {
                     return;
                 }
@@ -611,7 +613,7 @@ export class TractPolygons extends PolygonManager {
                 });
 
                 dataList[geoid] = rowDict;
-               
+                //console.log('TractData log:',rowDict)
             });
 
             dataList['MinMax'] = minMaxValues;
@@ -623,9 +625,9 @@ export class TractPolygons extends PolygonManager {
     }
 
     showInfoBox(event, feature) {
-        const geoid = event.feature.getProperty('GEOID10');
+        const geoid = event.feature.getProperty('GEOID20');
         const polygonData = this.dataList[geoid];
-        //console.log("showinfobox event:",geoid, event.feature.getProperty('GEOID10')); // From loadPolygonData
+        //console.log("showinfobox event:", geoid, event.feature.getProperty('GEOID20')); // From loadPolygonData
 
         if (polygonData) {
             const demographicData = `
