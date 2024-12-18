@@ -661,7 +661,7 @@ export class TractPolygons extends PolygonManager {
             // Combine content sections
             const content = `
                 <div>
-                    <h3>Tract: ${geoid}</h3>
+                    <h3>Tract ${polygonData['Census Tract']}</h3>
                     <h4>Geography</h4>
                     ${geographyData}
                     <h4>Demographics</h4>
