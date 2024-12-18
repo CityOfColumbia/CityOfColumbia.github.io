@@ -8,7 +8,6 @@ let isMapInitialized = false;  // Flag to track map initialization
 window.initMap = async function () {
     console.log('initMap is loaded');
     window.mapManager = new MapManager();
-    // window.htmlManager = new HTMLManager(window.mapManager);
     window.mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business")
     //const checkboxes = document.querySelectorAll('business-controls input[type="checkbox"]');
     // Pass the selected checkboxes to the setInputsTrue method
@@ -150,19 +149,20 @@ async function showFeatures(featureType) {
     });
 
     // Close the InfoWindow if it's open and clean up polygonManager
-    if (window.mapManager.polygonManager) {
-
-        if (window.mapManager.polygonManager.infoWindow!= null) {
-            window.mapManager.polygonManager.infoWindow.close();  // Close InfoWindow
-        }
-        window.mapManager.polygonManager.cleanup();  // Clean up event listeners and features
-    }
     if (window.mapManager.polygonManager.infowindow != null) {
 
         window.mapManager.polygonManager.infowindow.close();
     }
 
-    // Clean up the map (clear markers, layers, etc.)
+    if (window.mapManager.polygonManager) {
+
+        if (window.mapManager.polygonManager.infoWindow) {
+            window.mapManager.polygonManager.infoWindow.close();  // Close InfoWindow
+        }
+        window.mapManager.polygonManager.clearPolygonData();  // Clean up event listeners and features
+    }
+
+    
     if (featureType === 'Business') {
         window.mapManager.cleanup();
         document.getElementById('business-controls').style.display = 'block';

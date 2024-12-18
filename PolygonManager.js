@@ -90,6 +90,24 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         this.mapManager.map.data.setStyle(null); // Reset styles
         // Additional cleanup logic if needed
     }
+    clearPolygonData() {
+        // Reset data structures
+        this.dataList = {};
+        this.minMaxValues = {};
+
+        // Remove polygons from the map
+        Object.values(this.polygons).forEach(features => {
+            features.forEach(feature => this.mapManager.map.data.remove(feature));
+        });
+
+        // Clear polygons object
+        this.polygons = {};
+
+        // Clear InfoWindow and polygon listeners
+        this.cleanup();
+
+        console.log('Polygon data cleared successfully.');
+    }
 };
 
 export class BusinessPolygons extends PolygonManager {
@@ -513,14 +531,15 @@ export class TractPolygons extends PolygonManager {
         this.loadBlockGeoJson();
         this.csvData = polygonData;
         this.dataList = {};
+        this.minMaxValues = {};
         this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
         this.polygonListeners = []; // Track polygon event listeners
+        this.polygons = {}; // Track polygons by GEOID
         console.log("Constructing BlockPolygons!");
 
         this.loadPolygonData().then(dataList => {
             this.dataList = dataList;
         });
-
 
 
     }
@@ -671,6 +690,25 @@ export class TractPolygons extends PolygonManager {
         // Clear the list of polygon event listeners
         this.polygonListeners.forEach(listener => google.maps.event.removeListener(listener));
         this.polygonListeners = [];
+    }
+
+    clearPolygonData() {
+        // Reset data structures
+        this.dataList = {};
+        this.minMaxValues = {};
+
+        // Remove polygons from the map
+        Object.values(this.polygons).forEach(features => {
+            features.forEach(feature => this.mapManager.map.data.remove(feature));
+        });
+
+        // Clear polygons object
+        this.polygons = {};
+
+        // Clear InfoWindow and polygon listeners
+        this.cleanup();
+
+        console.log('Polygon data cleared successfully.');
     }
     
     
