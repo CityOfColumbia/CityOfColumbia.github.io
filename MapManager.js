@@ -1,9 +1,8 @@
-//import BusinessPolygons from './PolygonManager.js'
+// import BusinessPolygons from './PolygonManager.js'
 import {DemographicPolygons,BusinessPolygons,TractPolygons,PolygonManager} from './PolygonManager.js'
 import HTMLManager from './HTMLManager.js'
 import BusinessMarkers from './Markers.js'
 import EventListenerManager from './EventListenerManager.js'
-
 
 class MapManager {
 
@@ -234,7 +233,7 @@ class MapManager {
             await this.polygonManager.loadPolygonData();
         
             if (this.hasMarkerSet[mapID]) {
-                await this.createMarkerManager(markerData, mapID);
+                this.createMarkerManager(markerData, mapID);
                 await this.markerManager.createMarkers(await this.markerManager.data);
                 this.placeHeatMap(await this.markerManager.data);
                 console.log('heatmap created');
