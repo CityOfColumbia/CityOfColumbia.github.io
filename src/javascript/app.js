@@ -167,7 +167,7 @@ async function showFeatures(featureType) {
         window.mapManager.cleanup();
         document.getElementById('business-controls').style.display = 'block';
         window.mapManager.eventListeners.cleanupAllListeners();
-        window.mapManager.createMap('./data/WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
+        window.mapManager.createMap('./data/WardOutlines.geojson', './data/data.csv', './data/addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         document.getElementById('data-container').style.display = 'none';
     }
