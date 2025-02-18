@@ -97,6 +97,7 @@ class markersManager {
 
 class BusinessMarkers extends markersManager {
     constructor(mapManager, latlong) {
+        console.log("BusinessMarkers params are "+mapManager+','+latlong)
         super(mapManager, latlong);
     }
 

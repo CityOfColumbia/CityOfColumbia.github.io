@@ -19,7 +19,7 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
     
 
     async loadBooneCounty() {
-        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
+        this.mapManager.map.data.loadGeoJson('./data/Boone-County_MO.geojson', null, (features) => {
             features.forEach((feature) => {
                 feature.setProperty('visible', true);
                 let countyName = 'Boone County';
