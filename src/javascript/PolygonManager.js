@@ -105,8 +105,6 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
 
         // Clear InfoWindow and polygon listeners
         this.cleanup();
-
-        console.log('Polygon data cleared successfully.');
     }
 };
 
@@ -316,7 +314,6 @@ export class DemographicPolygons extends PolygonManager {
                 }
             });
     
-            console.log("Ward Rankings:", wardRankings);
             return { dataList, wardRankings, minMaxValues };
         } catch (error) {
             console.error('Error loading CSV data:', error);
@@ -535,7 +532,6 @@ export class TractPolygons extends PolygonManager {
         this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
         this.polygonListeners = []; // Track polygon event listeners
         this.polygons = {}; // Track polygons by GEOID
-        console.log("Constructing BlockPolygons!");
 
         this.loadPolygonData().then(dataList => {
             this.dataList = dataList;

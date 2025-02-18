@@ -28,7 +28,7 @@ class MapManager {
         this.eventListeners = null;
         this.polygonManager = null;
         console.log("\'this\' in MapManager is "+undefined)
-        // this.businessMarkerManager = new BusinessMarkers(this);
+        //  this.businessMarkerManager = new BusinessMarkers(this);
         this.heatMapZooms = {   
             1:5,
             2:5,

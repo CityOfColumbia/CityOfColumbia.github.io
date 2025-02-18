@@ -44,10 +44,10 @@ function setDemographicMapStyle(option){
     window.mapManager.htmlManager.changeText("map-legend-label", option)
     let rgbValues = []
     for(let i = 0; i<= 5; i++){
-        console.log(window.mapManager.polygonManager)
-        console.log("In set demographicmapstyle, ward rank and associated color ", window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
+        // console.log(window.mapManager.polygonManager)
+        // console.log("In set demographicmapstyle, ward rank and associated color ", window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option])
 
-        console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
+        // console.log("showing mapManager ward rankings",  window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)] )
         rgbValues.push( window.mapManager.polygonManager.getColor( window.mapManager.polygonManager.wardRankings["Ward " + (i + 1)][option]))
 
         // rgbValues.push(mapManager.polygonManager.getColor(demographics["Ward " + (i + 1)][option],mapManager.polygonManager.minMaxValues[option][0],mapManager.polygonManager.minMaxValues[option][1]))
@@ -167,21 +167,22 @@ async function showFeatures(featureType) {
         window.mapManager.cleanup();
         document.getElementById('business-controls').style.display = 'block';
         window.mapManager.eventListeners.cleanupAllListeners();
-        window.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
+        window.mapManager.createMap('./data/WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         document.getElementById('data-container').style.display = 'none';
     }
 
     if (featureType === 'Demographic') {
         window.mapManager.cleanup();
-        window.mapManager.businessMarkerManager.cleanup();
+        // window.mapManager.businessMarkerManager.cleanup();
+
         document.getElementById("businessSearch").value = '';        
         document.getElementById('business-controls').style.display = 'none';
         document.getElementById('demographic-controls').style.display = 'block';
         document.getElementById('demo-all').checked = true;
         
         if (!window.mapManager.polygonManager) {
-            await window.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
+            await window.mapManager.createMap('./data/WardOutlines.geojson', './data/demographics.csv', null, 'Demographic');
         }
         
         const wardData = window.mapManager.polygonManager.wardData;
