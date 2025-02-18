@@ -80,7 +80,6 @@ class HTMLManager {
             this.mapManager.cleanup();
             // Remove all Business markers when Demographic is selected
             this.mapManager.businessMarkerManager.cleanup();
-             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);    
              //Clear search bar text on swithcing to demographics
              document.getElementById("businessSearch").value = ''        
             // Hide the business controls and show the demographic controls

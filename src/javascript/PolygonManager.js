@@ -609,7 +609,6 @@ export class TractPolygons extends PolygonManager {
                 });
 
                 dataList[geoid] = rowDict;
-                //console.log('TractData log:',rowDict)
             });
 
             dataList['MinMax'] = minMaxValues;
@@ -707,8 +706,6 @@ export class TractPolygons extends PolygonManager {
 
         // Clear InfoWindow and polygon listeners
         this.cleanup();
-
-        console.log('Polygon data cleared successfully.');
     }
     
     

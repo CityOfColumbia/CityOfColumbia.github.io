@@ -27,7 +27,6 @@ class MapManager {
         this.htmlManager = new HTMLManager(this)
         this.eventListeners = null;
         this.polygonManager = null;
-        console.log("\'this\' in MapManager is "+undefined)
         //  this.businessMarkerManager = new BusinessMarkers(this);
         this.heatMapZooms = {   
             1:5,
@@ -129,9 +128,6 @@ class MapManager {
     }
     
     closeAllInfoBoxes() {
-        console.log("in closeallinfoboxes")
-        console.log(this.polygonManager.infoboxes)
-
             this.polygonManager.infoboxes.forEach(function(infobox) {
                 infobox.close();
             });
@@ -237,9 +233,7 @@ class MapManager {
                 this.createMarkerManager(markerData, mapID);
                 await this.markerManager.createMarkers(await this.markerManager.data);
                 this.placeHeatMap(await this.markerManager.data);
-                console.log('heatmap created');
                 await this.markerManager.placeOnLatLong(this.markerManager.data);
-                console.log('markers generated');
             }
         }
         

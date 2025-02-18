@@ -9,7 +9,6 @@ class markersManager {
     }
 
     async loadCSV(url){
-        console.log("URL to get csv from is "+url);
         const response = await fetch(url);
         const csvText = await response.text();
         const parsedData = Papa.parse(csvText, {
@@ -89,15 +88,10 @@ class markersManager {
     
         this.allMarkers = []
     }
-
-    testfunc(){
-        console.log("List of Markers!:", this.markerDataList)
-    }
 }
 
 class BusinessMarkers extends markersManager {
     constructor(mapManager, latlong) {
-        console.log("BusinessMarkers params are "+mapManager+','+latlong)
         super(mapManager, latlong);
     }
 
@@ -237,13 +231,6 @@ class BusinessMarkers extends markersManager {
 
         this.createMarkers(csvData); // Initially create markers
     }
-
-
-
-    showMarkers(){
-        console.log(this.markerDataList)
-    }
-
 
 debouncedSearch() {
     clearTimeout(this.debounceTimeout);
