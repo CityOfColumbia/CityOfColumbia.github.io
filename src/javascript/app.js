@@ -216,7 +216,7 @@ async function showFeatures(featureType) {
         window.mapManager.htmlManager.hideTable('data-container');
 
         if (!window.mapManager.polygonManager) {
-            await window.mapManager.createMap('census_blocks.json', 'TractDataTest.csv', null, 'Tract');
+            await window.mapManager.createMap('./data/census_blocks.json', './data/TractDataTest.csv', null, 'Tract');
         }
     }
 }
