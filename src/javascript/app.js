@@ -8,7 +8,7 @@ let isMapInitialized = false;  // Flag to track map initialization
 window.initMap = async function () {
     console.log('initMap is loaded');
     window.mapManager = new MapManager();
-    window.mapManager.createMap("WardOutlines.geojson", "data.csv", "addresses_with_wards_NEW.csv", "Business")
+    window.mapManager.createMap("../data/WardOutlines.geojson", "../data/data.csv", "../data/addresses_with_wards_NEW.csv", "Business")
     //const checkboxes = document.querySelectorAll('business-controls input[type="checkbox"]');
     // Pass the selected checkboxes to the setInputsTrue method
     //window.mapManager.htmlManager.setInputsTrue(checkboxes);

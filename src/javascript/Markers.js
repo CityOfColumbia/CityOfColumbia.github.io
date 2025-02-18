@@ -9,6 +9,7 @@ class markersManager {
     }
 
     async loadCSV(url){
+        console.log("URL to get csv from is "+url);
         const response = await fetch(url);
         const csvText = await response.text();
         const parsedData = Papa.parse(csvText, {
