@@ -71,7 +71,7 @@ class HTMLManager {
             //Removing data on switching maps
             this.mapManager.eventListeners.cleanupAllListeners()
             // Create the Business map
-            this.mapManager.createMap('WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
+            this.mapManager.createMap('./data/WardOutlines.geojson', 'data.csv', 'addresses_with_wards_NEW.csv', 'Business');
             this.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
             document.getElementById('data-container').style.display = 'none';
         }
@@ -80,14 +80,13 @@ class HTMLManager {
             this.mapManager.cleanup();
             // Remove all Business markers when Demographic is selected
             this.mapManager.businessMarkerManager.cleanup();
-             console.log('Removing business markers:', this.mapManager.businessMarkerManager.data);    
              //Clear search bar text on swithcing to demographics
              document.getElementById("businessSearch").value = ''        
             // Hide the business controls and show the demographic controls
             document.getElementById('business-controls').style.display = 'none';
             document.getElementById('demographic-controls').style.display = 'block';
             if (!this.mapManager.polygonManager) {
-                this.mapManager.createMap('WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
+                this.mapManager.createMap('./data/WardOutlines.geojson', 'demographics.csv', null, 'Demographic');
             }
 
             

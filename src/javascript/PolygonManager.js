@@ -19,7 +19,7 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
     
 
     async loadBooneCounty() {
-        this.mapManager.map.data.loadGeoJson('Boone-County_MO.geojson', null, (features) => {
+        this.mapManager.map.data.loadGeoJson('./data/Boone-County_MO.geojson', null, (features) => {
             features.forEach((feature) => {
                 feature.setProperty('visible', true);
                 let countyName = 'Boone County';
@@ -80,7 +80,7 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
         //     this.map.event.removeListener(listener);
         // });
 
-        this.eventListeners = [];
+        this.eventListeners = []; //(Sam) I think line does nothing, I think
 
         this.mapManager.map.data.forEach((feature) => {
             if (feature.getProperty('managerId') === this.managerId) {
@@ -105,14 +105,12 @@ import { wards, RGBAValues, DemographicHierarchy } from './definitions.js';
 
         // Clear InfoWindow and polygon listeners
         this.cleanup();
-
-        console.log('Polygon data cleared successfully.');
     }
 };
 
 export class BusinessPolygons extends PolygonManager {
     constructor(mapManager, geoJsonUrl, polygonData,managerID) {
-        super(mapManager, geoJsonUrl, polygonData,managerID);
+        super(mapManager, geoJsonUrl, polygonData,managerID); //(Sam) looks like this does not pass the params to super constructor in the right order (different still than TractPolygons)
         this.infowindow = null; // Define infowindow as a property of the class
         this.csvUrl = polygonData;
         this.loadWardGeoJson();
@@ -316,7 +314,6 @@ export class DemographicPolygons extends PolygonManager {
                 }
             });
     
-            console.log("Ward Rankings:", wardRankings);
             return { dataList, wardRankings, minMaxValues };
         } catch (error) {
             console.error('Error loading CSV data:', error);
@@ -535,7 +532,6 @@ export class TractPolygons extends PolygonManager {
         this.infoWindow = new google.maps.InfoWindow(); // Create InfoWindow instance
         this.polygonListeners = []; // Track polygon event listeners
         this.polygons = {}; // Track polygons by GEOID
-        console.log("Constructing BlockPolygons!");
 
         this.loadPolygonData().then(dataList => {
             this.dataList = dataList;
@@ -613,7 +609,6 @@ export class TractPolygons extends PolygonManager {
                 });
 
                 dataList[geoid] = rowDict;
-                //console.log('TractData log:',rowDict)
             });
 
             dataList['MinMax'] = minMaxValues;
@@ -694,6 +689,8 @@ export class TractPolygons extends PolygonManager {
         this.polygonListeners = [];
     }
 
+
+    //(Sam) pretty sure this can be deleted since TractPolygons inherits from PolygonMangaer
     clearPolygonData() {
         // Reset data structures
         this.dataList = {};
@@ -709,8 +706,6 @@ export class TractPolygons extends PolygonManager {
 
         // Clear InfoWindow and polygon listeners
         this.cleanup();
-
-        console.log('Polygon data cleared successfully.');
     }
     
     

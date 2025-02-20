@@ -88,10 +88,6 @@ class markersManager {
     
         this.allMarkers = []
     }
-
-    testfunc(){
-        console.log("List of Markers!:", this.markerDataList)
-    }
 }
 
 class BusinessMarkers extends markersManager {
@@ -235,13 +231,6 @@ class BusinessMarkers extends markersManager {
 
         this.createMarkers(csvData); // Initially create markers
     }
-
-
-
-    showMarkers(){
-        console.log(this.markerDataList)
-    }
-
 
 debouncedSearch() {
     clearTimeout(this.debounceTimeout);
