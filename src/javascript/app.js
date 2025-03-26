@@ -5,7 +5,7 @@ let isMapInitialized = false;  // Flag to track map initialization
 
 window.initMap = async function () {
     window.mapManager = new MapManager();
-    window.mapManager.createMap("./data/WardOutlines.geojson", "./data/data.csv", "./data/addresses_with_wards_NEW.csv", "Business")
+    window.mapManager.createMap("./src/data/WardOutlines.geojson", "./src/data/data.csv", "./src/data/addresses_with_wards_NEW.csv", "Business")
     //const checkboxes = document.querySelectorAll('business-controls input[type="checkbox"]');
     // Pass the selected checkboxes to the setInputsTrue method
     //window.mapManager.htmlManager.setInputsTrue(checkboxes);
@@ -162,7 +162,7 @@ async function showFeatures(featureType) {
         window.mapManager.cleanup();
         document.getElementById('business-controls').style.display = 'block';
         window.mapManager.eventListeners.cleanupAllListeners();
-        window.mapManager.createMap('./data/WardOutlines.geojson', './data/data.csv', './data/addresses_with_wards_NEW.csv', 'Business');
+        window.mapManager.createMap('./src/data/WardOutlines.geojson', './src/data/data.csv', './src/data/addresses_with_wards_NEW.csv', 'Business');
         window.mapManager.polygonManager.setAllStyle('#FFFFFF', 0, '#FFFFFF', 2);
         document.getElementById('data-container').style.display = 'none';
     }
@@ -177,7 +177,7 @@ async function showFeatures(featureType) {
         document.getElementById('demo-all').checked = true;
         
         if (!window.mapManager.polygonManager) {
-            await window.mapManager.createMap('./data/WardOutlines.geojson', './data/demographics.csv', null, 'Demographic');
+            await window.mapManager.createMap('./src/data/WardOutlines.geojson', './src/data/demographics.csv', null, 'Demographic');
         }
         
         const wardData = window.mapManager.polygonManager.wardData;
@@ -210,7 +210,7 @@ async function showFeatures(featureType) {
         window.mapManager.htmlManager.hideTable('data-container');
 
         if (!window.mapManager.polygonManager) {
-            await window.mapManager.createMap('./data/census_blocks.json', './data/TractDataTest.csv', null, 'Tract');
+            await window.mapManager.createMap('./src/data/census_blocks.json', './src/data/TractDataTest.csv', null, 'Tract');
         }
     }
 }
